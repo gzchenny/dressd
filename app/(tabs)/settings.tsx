@@ -2,16 +2,15 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { ScrollView, StyleSheet } from "react-native";
 
-export default function StyleProfileScreen() {
+export default function SettingsScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView>
-        <ThemedText type="title">Style Profile</ThemedText>
+        <ThemedText type="title">Settings</ThemedText>
         <ThemedText>
-          Set up your style preferences and connect social media for
-          personalized recommendations.
+          Manage your account, payment methods, and app settings.
         </ThemedText>
-        {/* Add Pinterest integration, style preferences, size info, etc. */}
+        {/* Add user info, payment methods, settings, help, etc. */}
       </ScrollView>
     </ThemedView>
   );

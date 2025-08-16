@@ -1,26 +1,27 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * App color system: primary & background are white; purple is the accent.
  */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const primary = '#FFFFFF';       // base / primary surface
+const accent = '#653A79';        // purple accent
+const lightText = '#2B1F31';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: '#2B1F31',
+    background: '#FFFFFF',
+    tint: '#792f9bff',
+    icon: '#6f4489ff',
+    tabIconDefault: '#B8A4C4',
+    tabIconSelected: '#653A79',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#000000ff',
+    background: '#FFFFFF',       
+    tint: '#792f9bff',
+    icon: '#6f4489ff',
+    tabIconDefault: '#B8A4C4',
+    tabIconSelected: '#653A79',
   },
 };
+
+export { primary, accent };

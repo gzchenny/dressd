@@ -1,5 +1,5 @@
 import { db } from '@/config/firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 export interface UserData {
   userId: string;
@@ -8,8 +8,10 @@ export interface UserData {
   birthday: string;
   location: string;
   trustworthyRating: number;
-  activeRentals: string[];
-  inactiveRentals: string[];
+  activeItems: string[]; // Items available for rent/sale
+  inactiveItems: string[]; // Items being cleaned, rented out, etc.
+  activeRentals: string[]; // Items user is currently renting from others
+  inactiveRentals: string[]; // Past rentals
   soldItems: string[];
   rentedOutRentals: string[];
   createdAt: string;
@@ -27,6 +29,8 @@ export const createUserProfile = async (userId: string, userData: Partial<UserDa
     birthday: userData.birthday || '',
     location: userData.location || '',
     trustworthyRating: 5.0,
+    activeItems: [], // Changed from activeRentals
+    inactiveItems: [], // New field
     activeRentals: [],
     inactiveRentals: [],
     soldItems: [],
@@ -58,4 +62,31 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserDat
   };
   
   await updateDoc(userRef, updatedData);
+};
+
+// Helper functions to manage item states
+export const addItemToUser = async (userId: string, itemId: string) => {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, {
+    activeItems: arrayUnion(itemId),
+    updatedAt: new Date().toISOString()
+  });
+};
+
+export const moveItemToInactive = async (userId: string, itemId: string) => {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, {
+    activeItems: arrayRemove(itemId),
+    inactiveItems: arrayUnion(itemId),
+    updatedAt: new Date().toISOString()
+  });
+};
+
+export const moveItemToActive = async (userId: string, itemId: string) => {
+  const userRef = doc(db, 'users', userId);
+  await updateDoc(userRef, {
+    inactiveItems: arrayRemove(itemId),
+    activeItems: arrayUnion(itemId),
+    updatedAt: new Date().toISOString()
+  });
 };
