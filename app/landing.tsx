@@ -3,11 +3,14 @@ import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Link } from 'expo-router';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function LandingScreen() {
   const text = useThemeColor({}, 'text');
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={['top', 'left', 'right']}>
     <ThemedView style={styles.container}>
       <View style={styles.center}>
         <ThemedText type="title" style={[styles.title, { color: '#653A79' }]}>Dressd</ThemedText>
@@ -29,6 +32,8 @@ export default function LandingScreen() {
         </Link>
       </View>
     </ThemedView>
+    </SafeAreaView>
+
   );
 }
 
@@ -41,5 +46,5 @@ const styles = StyleSheet.create({
   primary: { backgroundColor: '#653A79', padding: 18, borderRadius: 14, alignItems: 'center' },
   primaryText: { color: 'white', fontSize: 18, fontWeight: '600' },
   secondary: { padding: 18, borderRadius: 14, borderWidth: 1.5, alignItems: 'center' },
-  secondaryText: { fontSize: 16, fontWeight: '500' },
+  secondaryText: { fontSize: 16, fontWeight: '500', textAlign: 'center' },
 });

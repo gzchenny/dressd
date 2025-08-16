@@ -1,12 +1,16 @@
-// app/_layout.tsx
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Colors } from '@/constants/Colors';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
+  console.log('RootLayout rendering');
+  const pathname = usePathname();
+  console.log('Current pathname:', pathname);
+
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -38,15 +42,18 @@ export default function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={colorScheme === 'light' ? lightNavTheme : darkNavTheme}>
-      <Stack initialRouteName="landing">
-        <Stack.Screen name="landing" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ title: 'Sign Up', headerBackTitle: 'Back' }} />
-        <Stack.Screen name="login" options={{ title: 'Sign In', headerBackTitle: 'Back' }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={colorScheme === 'light' ? lightNavTheme : darkNavTheme}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="landing" options={{ headerShown: false }} />
+          <Stack.Screen name="signup" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ title: 'Sign In', headerBackTitle: 'Back' }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

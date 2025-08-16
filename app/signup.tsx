@@ -1,7 +1,7 @@
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { auth } from "@/config/firebase";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { createUserProfile } from "@/services/userService";
 import { Link, router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -12,7 +12,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState("");
@@ -22,8 +24,6 @@ export default function SignUpScreen() {
   const [birthday, setBirthday] = useState("");
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const textColor = useThemeColor({}, "text");
 
   const handleSignUp = async () => {
     if (
@@ -67,7 +67,7 @@ export default function SignUpScreen() {
       });
 
       Alert.alert("Success", "Account created successfully!", [
-        { text: "OK", onPress: () => router.replace("/(tabs)") },
+        { text: "OK", onPress: () => router.replace("/(tabs)/home") },
       ]);
     } catch (error: any) {
       Alert.alert("Error", error.message);
@@ -77,80 +77,91 @@ export default function SignUpScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ThemedText type="title" style={styles.title}>
-          Create Account
-        </ThemedText>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={['top', 'left', 'right']}>
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <IconSymbol name="chevron.left" size={24} color="#653A79" />
+          </TouchableOpacity>
+        </View>
 
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Email"
-          placeholderTextColor={textColor + "80"}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Username"
-          placeholderTextColor={textColor + "80"}
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Birthday (YYYY-MM-DD)"
-          placeholderTextColor={textColor + "80"}
-          value={birthday}
-          onChangeText={setBirthday}
-        />
-
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Location (Country)"
-          placeholderTextColor={textColor + "80"}
-          value={location}
-          onChangeText={setLocation}
-        />
-
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Password"
-          placeholderTextColor={textColor + "80"}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TextInput
-          style={[styles.input, { color: textColor, borderColor: textColor }]}
-          placeholder="Confirm Password"
-          placeholderTextColor={textColor + "80"}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={[styles.button, { opacity: loading ? 0.6 : 1 }]}
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          <ThemedText style={styles.buttonText}>
-            {loading ? "Creating Account..." : "Sign Up"}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <ThemedText type="title" style={styles.title}>
+            Create Account
           </ThemedText>
-        </TouchableOpacity>
 
-        <Link href="/login" style={styles.link}>
-          <ThemedText type="link">Already have an account? Sign In</ThemedText>
-        </Link>
-      </ScrollView>
-    </ThemedView>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#653A7980"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            placeholderTextColor="#653A7980"
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Birthday (YYYY-MM-DD)"
+            placeholderTextColor="#653A7980"
+            value={birthday}
+            onChangeText={setBirthday}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Location (Country)"
+            placeholderTextColor="#653A7980"
+            value={location}
+            onChangeText={setLocation}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#653A7980"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#653A7980"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={[styles.button, { opacity: loading ? 0.6 : 1 }]}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            <ThemedText style={styles.buttonText}>
+              {loading ? "Creating Account..." : "Sign Up"}
+            </ThemedText>
+          </TouchableOpacity>
+
+          <Link href="/login" style={styles.link}>
+            <ThemedText style={styles.linkText}>Already have an account? Sign In</ThemedText>
+          </Link>
+        </ScrollView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -159,23 +170,35 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  header: {
+    paddingBottom: 20,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   title: {
     textAlign: "center",
     marginBottom: 40,
-    marginTop: 40,
+    marginTop: 20,
+    color: "#653A79",
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: "#653A79",
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
     fontSize: 16,
+    color: "#653A79",
   },
   button: {
-    backgroundColor: "#0a7ea4",
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 10,
+    backgroundColor: "#653A79",
+    padding: 16,
+    borderRadius: 14,
+    marginTop: 20,
     marginBottom: 20,
   },
   buttonText: {
@@ -187,5 +210,10 @@ const styles = StyleSheet.create({
   link: {
     textAlign: "center",
     marginTop: 15,
+  },
+  linkText: {
+    color: "#653A79",
+    textAlign: "center",
+    fontSize: 16,
   },
 });

@@ -18,6 +18,9 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { auth } from "@/config/firebase";
 import { getUserItems, ItemData, updateItem } from "@/services/itemService";
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 const { width } = Dimensions.get("window");
 const itemWidth = (width - 60) / 2;
@@ -153,6 +156,7 @@ export default function ItemsScreen() {
   );
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <ThemedText type="title">My Items</ThemedText>
@@ -209,6 +213,7 @@ export default function ItemsScreen() {
         onItemAdded={handleItemAdded}
       />
     </ThemedView>
+    </SafeAreaView>
   );
 }
 

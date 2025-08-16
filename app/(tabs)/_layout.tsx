@@ -4,8 +4,9 @@ import { Platform } from "react-native";
 import { Colors } from '@/constants/Colors';
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,7 +18,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors.light.icon,        
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
@@ -28,7 +28,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: "Explore",
           tabBarIcon: ({ color }) => (

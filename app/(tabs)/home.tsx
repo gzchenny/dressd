@@ -14,6 +14,8 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { getAllActiveItems, ItemData } from "@/services/itemService";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const { width } = Dimensions.get("window");
 const itemWidth = (width - 60) / 2; // 2 columns with padding
@@ -99,9 +101,10 @@ export default function HomeScreen() {
 
   if (loading && !refreshing) {
     return (
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
       <ThemedView style={styles.container}>
         <View style={styles.header}>
-          <ThemedText type="title">Welcome to DressD</ThemedText>
+          <ThemedText type="title">Welcome to Dressd.</ThemedText>
           <Text style={styles.subtitle}>Discover amazing fashion items</Text>
         </View>
         <View style={styles.loadingContainer}>
@@ -109,13 +112,15 @@ export default function HomeScreen() {
           <Text style={styles.loadingText}>Loading items...</Text>
         </View>
       </ThemedView>
+      </SafeAreaView>
     );
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title">Welcome to DressD</ThemedText>
+        <ThemedText type="title">Welcome to Dressd.</ThemedText>
         <Text style={styles.subtitle}>Discover amazing fashion items</Text>
         <Text style={styles.itemCount}>
           {items.length} item{items.length !== 1 ? "s" : ""} available
@@ -152,6 +157,8 @@ export default function HomeScreen() {
         )}
       </ScrollView>
     </ThemedView>
+    </SafeAreaView>
+
   );
 }
 
