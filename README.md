@@ -1,6 +1,28 @@
-# Welcome to your Expo app 👋
+# 👗 dressd
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**dressd** is an app built for FoundersHack made with [Expo](https://expo.dev) and React Native. It’s an online clothing rental app that lets users rent, list, and discover designer styles, with personalised recommendations inspired by user's photos and personal style moodboards.
+
+---
+
+## 🚀 Features
+
+- **Browse & Search:** Explore trending and personalised items on the home screen.
+
+- **Wishlist:** Heart items to save them for later ([`app/(tabs)/wishlist.tsx`](app/(tabs)/wishlist.tsx)).
+
+- **Cart & Checkout:** Add items to your cart and complete secure checkout ([`app/(tabs)/cart.tsx`](app/(tabs)/cart.tsx), [`app/checkout.tsx`](app/checkout.tsx)).
+
+- **List Your Items:** Add your own fashion pieces for rent ([`components/AddItemModal.tsx`](components/AddItemModal.tsx), [`app/(tabs)/items.tsx`](app/(tabs)/items.tsx)).
+
+- **Style Preferences:** Upload style photos to get personalized recommendations ([`app/(tabs)/styles.tsx`](app/(tabs)/styles.tsx)).
+
+- **Profile & Authentication:** Sign up, log in, and manage your profile ([`app/signup.tsx`](app/signup.tsx), [`app/login.tsx`](app/login.tsx)).
+
+- **Firebase Backend:** User, item, and rental data stored in Firestore ([`config/firebase.js`](config/firebase.js)).
+
+- **Modern UI:** Custom components, parallax scroll, haptic tabs, and themed views.
+
+---
 
 ## Get started
 
@@ -16,35 +38,59 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Project Structure
+app/: Screens and file-based routing
+Home, Wishlist, Cart, Items, Styles, Product Details, Auth
+components/: UI components (AppBar, ProductCard, AddItemModal, etc.)
+services/: Business logic (cart, wishlist, user, item, embedding)
+types/: TypeScript types
+constants/: App-wide constants
+config/: Firebase config
+assets/: Images and fonts
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Key Screens
+app/(tabs)/home.tsx: Trending & personalized feed
+app/(tabs)/wishlist.tsx: Wishlist management
+app/(tabs)/cart.tsx: Cart and checkout flow
+app/(tabs)/items.tsx: List/manage your items
+app/(tabs)/styles.tsx: Style photo preferences
+app/product/[id].tsx: Product details & rental calendar
+app/signup.tsx, app/login.tsx: Authentication
 
-## Get a fresh project
+## Authentication
+Firebase Auth (config/firebase.js)
+Sign up and log in screens
+User profile creation (services/userService.ts)
 
-When you're ready, run:
+## Personalisation
+Upload style photos (app/(tabs)/styles.tsx)
+Embedding-based recommendations (services/embeddingService.ts)
 
-```bash
+## Development Notes
+File-based routing via Expo Router
+Custom hooks and UI components
+All business logic in /services
+TypeScript throughout
+
+## Resetting the Project
+To start fresh, run:
+```
 npm run reset-project
 ```
+Moves starter code to /app-example and creates a blank /app directory.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Learn More
+Expo documentation
+Expo Router
+Firebase
 
-## Learn more
+## Hackathon Team
+Built for FoundersHack by Team Andreprenuers
 
-To learn more about developing your project with Expo, look at the following resources:
+## Contributing
+We welcome pull questions. For questions, open an issue or contact the team.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+For FoundersHack hackathon use only
