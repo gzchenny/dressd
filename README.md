@@ -27,6 +27,8 @@
 ## Get started
 
 note: to use the upload image feature, you will need to get your own api key for google cloud vision api and set it up in the project config.
+
+
 EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY="KEY HERE"
 
 Ensure you have Expo installed.
