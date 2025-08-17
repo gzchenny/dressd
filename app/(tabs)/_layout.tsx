@@ -37,6 +37,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="wishlist"
+        options={{
+          href: null, // This hides it from the tab bar but keeps it in the stack
+        }}
+      />
+      <Tabs.Screen
         name="items"
         options={{
           title: "My Items",
