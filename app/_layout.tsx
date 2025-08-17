@@ -129,7 +129,7 @@ export function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="styles"
         options={{
           title: "Styles",
           tabBarIcon: ({ color }) => (

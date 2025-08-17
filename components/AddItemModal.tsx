@@ -1,22 +1,23 @@
 import { auth } from "@/config/firebase";
 import {
-  createEmbeddingFromAttributes,
-  generateItemAttributes,
-} from "@/services/attributeGenerator"; // Add createEmbeddingFromAttributes
+    createEmbeddingFromAttributes,
+    generateItemAttributes,
+} from "@/services/attributeGenerator";
 import { addItem } from "@/services/itemService";
 import { addItemToUser } from "@/services/userService";
 import { ItemData } from "@/types/itemAttributes";
-import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Image,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface AddItemModalProps {
@@ -34,16 +35,90 @@ export default function AddItemModal({
   const [description, setDescription] = useState("");
   const [rentPrice, setRentPrice] = useState("");
   const [securityDeposit, setSecurityDeposit] = useState("");
-  const [imageUrl, setImageUrl] = useState<string>(""); // Changed from imageUri to imageUrl
+  const [imageUrl, setImageUrl] = useState<string>(""); // Keep this but hide the field
   const [loading, setLoading] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null); // Add this for local image URI
 
+  // Reset the form
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setRentPrice("");
     setSecurityDeposit("");
-    setImageUrl(""); // Reset URL
+    setImageUrl("");
+    setImageUri(null);
   };
+
+  // Add this function to pick image from gallery
+  const pickImage = async () => {
+    try {
+      // Request permissions
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission Required",
+          "You need to grant gallery permissions to upload images"
+        );
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        // Set the local image URI for preview
+        setImageUri(result.assets[0].uri);
+
+        // For demo purposes, we're using the local URI as the imageUrl
+        // In a real app, you'd upload this to storage and get a URL
+        setImageUrl(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert("Error", "Failed to select image from gallery");
+    }
+  };
+
+  // Add logic to use hardcoded image URLs based on title
+  useEffect(() => {
+    // Check for specific keywords in title and set corresponding image URLs
+    const titleLower = title.toLowerCase();
+
+    if (
+      (titleLower.includes("red dress") ||
+        (titleLower.includes("red") && titleLower.includes("dress"))) &&
+      !imageUri
+    ) {
+      const redDressUrl =
+        "https://t3.ftcdn.net/jpg/01/99/82/42/360_F_199824276_somlbrYKh1XlUnyvLbn3xwjZLlXvEkHx.jpg";
+      setImageUrl(redDressUrl);
+      setImageUri(redDressUrl);
+    } else if (
+      (titleLower.includes("blue dress") ||
+        (titleLower.includes("blue") && titleLower.includes("dress"))) &&
+      !imageUri
+    ) {
+      const blueDressUrl =
+        "https://reluv.com.au/cdn/shop/files/22081650.A_1024x1024.jpg?v=1690094036";
+      setImageUrl(blueDressUrl);
+      setImageUri(blueDressUrl);
+    } else if (
+      (titleLower.includes("black hoodie") ||
+        (titleLower.includes("black") && titleLower.includes("hoodie"))) &&
+      !imageUri
+    ) {
+      const blackHoodieUrl =
+        "https://au.yeti.com/cdn/shop/products/YETI_2H21_M_BFleece_Hoodie_Full_Pullover_Elevated_Black_Back_0340_B_f48d9e84-d1b0-46ca-82a1-2e48b3bdc2ca.png?v=1662717885&width=846";
+      setImageUrl(blackHoodieUrl);
+      setImageUri(blackHoodieUrl);
+    }
+  }, [title]);
 
   const handleSubmit = async () => {
     if (!title || !description || !rentPrice || !securityDeposit || !imageUrl) {
@@ -126,6 +201,7 @@ export default function AddItemModal({
       presentationStyle="pageSheet"
     >
       <View style={styles.container}>
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.cancelButton}>Cancel</Text>
@@ -165,32 +241,34 @@ export default function AddItemModal({
             />
           </View>
 
-          {/* Image URL Input */}
+          {/* Replace URL input with image picker */}
           <View style={styles.section}>
-            <Text style={styles.label}>Image URL *</Text>
-            <TextInput
-              style={styles.input}
-              value={imageUrl}
-              onChangeText={setImageUrl}
-              placeholder="https://example.com/image.jpg"
-              placeholderTextColor="#999"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <Text style={styles.helperText}>
-              Paste a URL to an image of your item
-            </Text>
+            <Text style={styles.label}>Item Image *</Text>
+            <TouchableOpacity
+              style={styles.imagePickerButton}
+              onPress={pickImage}
+            >
+              <Text style={styles.imagePickerButtonText}>
+                {imageUri ? "Change Image" : "Select Image from Gallery"}
+              </Text>
+            </TouchableOpacity>
 
-            {/* Preview image if URL is provided */}
-            {imageUrl && (
+            {/* Preview image */}
+            {imageUri && (
               <View style={styles.imagePreview}>
                 <Image
-                  source={{ uri: imageUrl }}
+                  source={{ uri: imageUri }}
                   style={styles.previewImage}
-                  onError={() => Alert.alert("Error", "Invalid image URL")}
+                  onError={() => Alert.alert("Error", "Invalid image")}
                 />
               </View>
             )}
+
+            {/* Hidden text note for demo hardcoding */}
+            <Text style={styles.helperText}>
+              Try titles like "Red Dress", "Blue Dress", or "Black Hoodie" for
+              demo
+            </Text>
           </View>
 
           {/* Rent Price Input */}
@@ -224,6 +302,7 @@ export default function AddItemModal({
   );
 }
 
+// Add these new styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -296,5 +375,17 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 8,
     resizeMode: "cover",
+  },
+  imagePickerButton: {
+    backgroundColor: "#653A79",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  imagePickerButtonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
