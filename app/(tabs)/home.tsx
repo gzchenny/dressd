@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -12,12 +12,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { ProductCard } from "@/components/ProductCard";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { getAllActiveItems, ItemData } from "@/services/itemService";
+import { addToWishlist, removeFromWishlist, getLikedItemIds } from "@/services/wishlistService";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 const cardWidth = width * 0.45; // Reduced from 0.72 to 0.45 to fit ~2.5 cards
@@ -39,16 +42,18 @@ export default function HomeScreen() {
       }
 
       const allItems = await getAllActiveItems();
+      const likedItemIds = await getLikedItemIds(); // Get persisted liked items
       
       // Transform items to include mock data for enhanced UI
       const enhancedItems = allItems.map(item => ({
         ...item,
         brand: item.ownerUsername || "Designer",
         originalRetail: item.rentPrice ? item.rentPrice * 5 : undefined,
-        liked: likedItems.has(item.id || ""),
+        liked: likedItemIds.includes(item.id || ""), // Use the array from AsyncStorage directly,
       }));
       
       setItems(enhancedItems);
+      setLikedItems(new Set(likedItemIds)); // Update the Set state with persisted data
     } catch (error) {
       console.error("Error loading items:", error);
     } finally {
@@ -61,6 +66,44 @@ export default function HomeScreen() {
     loadItems();
   }, []);
 
+  // Add focus effect to refresh data when navigating to this screen
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Home screen focused, refreshing items...');
+      loadItems();
+    }, [])
+  );
+
+  const handleToggleLike = async (id: string, liked: boolean) => {
+    console.log(`Toggling like for item ${id}: ${liked}`);
+    
+    try {
+      const newLikedItems = new Set(likedItems);
+    
+      if (liked) {
+        newLikedItems.add(id);
+        await addToWishlist(id);
+        console.log(`Successfully added item ${id} to wishlist`);
+      } else {
+        newLikedItems.delete(id);
+        await removeFromWishlist(id);
+        console.log(`Successfully removed item ${id} from wishlist`);
+      }
+    
+      // Update state immediately for instant UI feedback
+      setLikedItems(newLikedItems);
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === id ? { ...item, liked } : item
+        )
+      );
+    } catch (error) {
+      console.error(`Error toggling like for item ${id}:`, error);
+      // Revert UI state on error
+      loadItems();
+    }
+  };
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     // TODO: Implement search filtering
@@ -71,26 +114,9 @@ export default function HomeScreen() {
     // TODO: Navigate to item details
   };
 
-  const handleToggleLike = (id: string, liked: boolean) => {
-    const newLikedItems = new Set(likedItems);
-    if (liked) {
-      newLikedItems.add(id);
-    } else {
-      newLikedItems.delete(id);
-    }
-    setLikedItems(newLikedItems);
-    
-    // Update the items array to reflect the change
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, liked } : item
-      )
-    );
-  };
-
   const handleWishlist = () => {
     console.log("Navigate to wishlist");
-    // TODO: Navigate to wishlist
+    router.push("/(tabs)/wishlist");
   };
 
   const handleCart = () => {
