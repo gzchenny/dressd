@@ -22,10 +22,7 @@ export default function RootLayout() {
   const pathname = usePathname();
   console.log("Current pathname:", pathname);
 
-  // Force light mode - comment out this line to use system theme
-  // const colorScheme = useColorScheme();
-  const colorScheme = 'light'; // Force light mode
-
+  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -44,10 +41,10 @@ export default function RootLayout() {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      background: '#FFFFFF',        // Force white background
-      card: '#FFFFFF',              // Force white cards
-      primary: '#653A79',           // Your brand color
-      text: '#2B1F31',              // Dark text
+      background: Colors.light.background,
+      card: Colors.light.background,
+      primary: Colors.light.tint,
+      text: Colors.light.text,
       border: "#E6DFEA",
     },
   };
@@ -56,40 +53,90 @@ export default function RootLayout() {
     ...DarkTheme,
     colors: {
       ...DarkTheme.colors,
-      background: '#FFFFFF',        // Even "dark" theme uses white background
-      card: '#FFFFFF',              // Even "dark" theme uses white cards
-      primary: '#653A79',           // Your brand color
-      text: '#2B1F31',              // Dark text even in "dark" mode
-      border: "#E6DFEA",
+      background: Colors.dark.background,
+      card: Colors.dark.background,
+      primary: Colors.dark.tint,
+      text: Colors.dark.text,
+      border: "#3A2A44",
     },
   };
 
   return (
-    // Always use light theme regardless of colorScheme
-    <ThemeProvider value={lightNavTheme}>
+    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="landing" options={{ headerShown: false }} />
         <Stack.Screen name="signup" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ title: 'Sign In', headerBackTitle: 'Back' }} />
-        <Stack.Screen 
-          name="product/[id]" 
-          options={{ 
-            headerShown: false,
-            presentation: 'modal'
-          }} 
+        <Stack.Screen
+          name="login"
+          options={{ title: "Sign In", headerBackTitle: "Back" }}
         />
-        <Stack.Screen 
-          name="checkout" 
-          options={{ 
+        <Stack.Screen
+          name="product/[id]"
+          options={{
             headerShown: false,
-            presentation: 'modal'
-          }} 
+            presentation: "modal", // Optional: makes it slide up from bottom
+          }}
         />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="dark" />
+      <StatusBar style="auto" />
     </ThemeProvider>
+  );
+}
+
+export function TabLayout() {
+  const colorScheme = useColorScheme();
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].icon,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: "absolute",
+          },
+          default: {},
+        }),
+      }}
+    >
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: "Explore",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          href: null, // Hidden from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="items"
+        options={{
+          title: "My Items",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="bag.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="styles"
+        options={{
+          title: "Styles",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="bag.fill" color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }

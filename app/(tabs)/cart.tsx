@@ -21,7 +21,6 @@ import {
   getCartTotal, 
   CartItem 
 } from '@/services/cartService';
-import { formatPrice } from '@/utils/money';
 
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -95,8 +94,15 @@ export default function CartScreen() {
     router.push('/(tabs)/home');
   };
 
+  const handleItemPress = (itemId: string) => {
+    router.push(`/product/${itemId}` as any);
+  };
+
   const renderCartItem = ({ item }: { item: CartItem }) => (
-    <View style={styles.cartItem}>
+    <TouchableOpacity 
+      style={styles.cartItem}
+      onPress={() => handleItemPress(item.itemId)}
+    >
       <View style={styles.itemImage}>
         {item.imageUrl ? (
           <Image 
@@ -130,10 +136,10 @@ export default function CartScreen() {
 
         <View style={styles.pricing}>
           <Text style={styles.rentPrice}>
-            {formatPrice(item.rentPrice)}/day × {item.totalDays} = {formatPrice(item.totalPrice)}
+            ${item.rentPrice}/day × {item.totalDays} = ${item.totalPrice}
           </Text>
           <Text style={styles.securityText}>
-            Security: {formatPrice(item.securityDeposit)}
+            Security: ${item.securityDeposit}
           </Text>
         </View>
       </View>
@@ -144,7 +150,7 @@ export default function CartScreen() {
       >
         <IconSymbol name="xmark" size={20} color="#ff3b30" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -190,15 +196,15 @@ export default function CartScreen() {
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Rental Total:</Text>
-              <Text style={styles.summaryValue}>{formatPrice(totals.subtotal)}</Text>
+              <Text style={styles.summaryValue}>${totals.subtotal}</Text>
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Security Deposits:</Text>
-              <Text style={styles.summaryValue}>{formatPrice(totals.securityDeposits)}</Text>
+              <Text style={styles.summaryValue}>${totals.securityDeposits}</Text>
             </View>
             <View style={[styles.summaryRow, styles.totalRow]}>
               <Text style={styles.totalLabel}>Total:</Text>
-              <Text style={styles.totalValue}>{formatPrice(totals.total)}</Text>
+              <Text style={styles.totalValue}>${totals.total}</Text>
             </View>
             
             <TouchableOpacity 

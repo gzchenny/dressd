@@ -7,20 +7,15 @@ import React from "react";
 import { Platform } from "react-native";
 
 export default function TabLayout() {
-  // Force light mode colors regardless of system theme
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#653A79',      // Your brand color
-        tabBarInactiveTintColor: '#666666',    // Gray for inactive
+        tabBarActiveTintColor: '#653A79',
+        tabBarInactiveTintColor: '#666666',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',          // Force white background
-          borderTopColor: '#E6DFEA',          // Light border
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E6DFEA',
           borderTopWidth: 1,
-          position: Platform.select({
-            ios: "absolute",
-            default: undefined,
-          }),
         },
         headerShown: false,
         tabBarButton: HapticTab,
@@ -38,13 +33,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="wishlist"
         options={{
-          href: null, // This hides it from the tab bar but keeps it in the stack
+          href: null, // Hidden from tab bar
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
-          href: null, // Hide cart from tab bar like wishlist
+          href: null, // Hidden from tab bar like wishlist
         }}
       />
       <Tabs.Screen
@@ -57,9 +52,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="styles"
         options={{
-          title: "Settings",
+          title: "Styles",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.fill" color={color} />
           ),
