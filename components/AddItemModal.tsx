@@ -1,8 +1,9 @@
 import { auth } from "@/config/firebase";
-import { addItem, ItemData } from "@/services/itemService";
-import { addItemToUser, getUserProfile } from "@/services/userService";
+import { addItem } from "@/services/itemService";
+import { getUserProfile } from "@/services/userService";
+import { ItemData } from "@/types/itemAttributes"; // Import from types instead
 import * as ImagePicker from "expo-image-picker";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Image,
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 
 interface AddItemModalProps {
   visible: boolean;
@@ -42,10 +42,9 @@ export default function AddItemModal({
     setImageUri(null);
     // Force a small delay to let iOS clear autofill state
     setTimeout(() => {
-      console.log('Form reset completed');
+      console.log("Form reset completed");
     }, 100);
   };
-
 
   const pickImage = async () => {
     // Request permission to access media library
@@ -151,27 +150,26 @@ export default function AddItemModal({
         return;
       }
 
-      const itemData: Omit<ItemData, "id" | "createdAt" | "updatedAt"> = {
+      // Note: attributes and embedding will be generated automatically in addItem
+      const itemData: Omit<
+        ItemData,
+        "id" | "createdAt" | "updatedAt" | "attributes" | "embedding"
+      > = {
         title: title.trim(),
         description: description.trim(),
-        type: "rent", // Only rent option now
         rentPrice: parseFloat(rentPrice),
         securityDeposit: parseFloat(securityDeposit),
         ownerId: user.uid,
         ownerUsername: userProfile.username,
         isActive: true,
-        imageUrl: imageUri || undefined, // Use local image URI for now
+        imageUrl: imageUri || undefined,
       };
 
       console.log("Item data:", itemData);
 
-      // Add item to Firestore
-      const itemId = await addItem(itemData);
-      console.log("Item created with ID:", itemId);
-
-      // Add item to user's activeItems array
-      await addItemToUser(user.uid, itemId);
-      console.log("Item added to user's activeItems");
+      // Add item to Firestore (attributes and embedding will be generated automatically)
+      await addItem(itemData);
+      console.log("Item created");
 
       Alert.alert("Success", "Item added successfully!");
       resetForm();
@@ -235,28 +233,27 @@ export default function AddItemModal({
               autoCapitalize="sentences"
               // Force re-render key to break autofill cache:
               key={`title-${visible}`}
-            
             />
           </View>
 
           <View style={styles.section}>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Describe your item: size, color, brand, condition..."
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-            // Same autofill prevention:
-            autoComplete="off"
-            autoCorrect={false}
-            spellCheck={false}
-            textContentType="none"
-            selectionColor="#007AFF"
-            placeholderTextColor="#999"
-            importantForAutofill="no"
-          />
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Describe your item: size, color, brand, condition..."
+              multiline
+              numberOfLines={4}
+              maxLength={500}
+              // Same autofill prevention:
+              autoComplete="off"
+              autoCorrect={false}
+              spellCheck={false}
+              textContentType="none"
+              selectionColor="#007AFF"
+              placeholderTextColor="#999"
+              importantForAutofill="no"
+            />
           </View>
 
           <View style={styles.section}>
@@ -314,24 +311,24 @@ export default function AddItemModal({
 
           <View style={styles.section}>
             <Text style={styles.label}>Security Deposit ($)</Text>
-              <TextInput
-                style={styles.input}
-                value={securityDeposit}
-                onChangeText={setSecurityDeposit}
-                placeholder="100.00"
-                keyboardType="decimal-pad"
-                // Autofill prevention:
-                autoComplete="off"
-                textContentType="none"
-                selectionColor="#007AFF"
-                placeholderTextColor="#999"
-                importantForAutofill="no"
-                clearButtonMode="never"
-                autoCapitalize="sentences"
-                key={`description-${visible}`}              
-                />            
+            <TextInput
+              style={styles.input}
+              value={securityDeposit}
+              onChangeText={setSecurityDeposit}
+              placeholder="100.00"
+              keyboardType="decimal-pad"
+              // Autofill prevention:
+              autoComplete="off"
+              textContentType="none"
+              selectionColor="#007AFF"
+              placeholderTextColor="#999"
+              importantForAutofill="no"
+              clearButtonMode="never"
+              autoCapitalize="sentences"
+              key={`description-${visible}`}
+            />
             <Text style={styles.helperText}>
-            Refundable deposit to protect against damage or loss
+              Refundable deposit to protect against damage or loss
             </Text>
           </View>
         </ScrollView>
@@ -386,16 +383,16 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     // Force white background and dark text:
-    backgroundColor: '#FFFFFF',
-    color: '#000000',
+    backgroundColor: "#FFFFFF",
+    color: "#000000",
     // Additional iOS fixes:
-    textAlign: 'left',
-    textAlignVertical: 'center',
+    textAlign: "left",
+    textAlignVertical: "center",
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   helperText: {
     fontSize: 12,

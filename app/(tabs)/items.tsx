@@ -16,11 +16,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { auth } from "@/config/firebase";
-import { getUserItems, ItemData, updateItem } from "@/services/itemService";
+import { getUserItems, updateItem } from "@/services/itemService"; // Remove ItemData from here
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-
+import { ItemData } from "@/types/itemAttributes"; // Import ItemData from types instead
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 const itemWidth = (width - 60) / 2;
@@ -120,21 +119,14 @@ export default function ItemsScreen() {
           {item.description}
         </Text>
 
+        {/* Remove or modify the typeTag section since ItemData doesn't have a type property */}
         <View style={styles.typeTag}>
-          <Text style={styles.typeTagText}>
-            {item.type === "both"
-              ? "Rent & Buy"
-              : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-          </Text>
+          <Text style={styles.typeTagText}>For Rent</Text>
         </View>
 
         <View style={styles.priceContainer}>
-          {item.rentPrice && (
-            <Text style={styles.priceText}>Rent: ${item.rentPrice}</Text>
-          )}
-          {item.buyPrice && (
-            <Text style={styles.priceText}>Buy: ${item.buyPrice}</Text>
-          )}
+          <Text style={styles.priceText}>Rent: ${item.rentPrice}</Text>
+          <Text style={styles.priceText}>Deposit: ${item.securityDeposit}</Text>
         </View>
 
         <View style={styles.itemFooter}>
@@ -156,63 +148,63 @@ export default function ItemsScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="title">My Items</ThemedText>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
+    <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <ThemedText type="title">My Items</ThemedText>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setShowAddModal(true)}
+          >
+            <IconSymbol name="house.fill" size={20} color="#fff" />
+            <Text style={styles.addButtonText}>Add Item</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>
+              {items.filter((item) => item.isActive).length}
+            </Text>
+            <Text style={styles.statLabel}>Active</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>
+              {items.filter((item) => !item.isActive).length}
+            </Text>
+            <Text style={styles.statLabel}>Inactive</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{items.length}</Text>
+            <Text style={styles.statLabel}>Total</Text>
+          </View>
+        </View>
+
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={loadItems} />
+          }
         >
-          <IconSymbol name="house.fill" size={20} color="#fff" />
-          <Text style={styles.addButtonText}>Add Item</Text>
-        </TouchableOpacity>
-      </View>
+          {items.length > 0 ? (
+            <View style={styles.itemsGrid}>
+              {items.map((item, index) => renderItem(item, index))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <ThemedText>
+                No items yet. Add your first item to start renting!
+              </ThemedText>
+            </View>
+          )}
+        </ScrollView>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {items.filter((item) => item.isActive).length}
-          </Text>
-          <Text style={styles.statLabel}>Active</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {items.filter((item) => !item.isActive).length}
-          </Text>
-          <Text style={styles.statLabel}>Inactive</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{items.length}</Text>
-          <Text style={styles.statLabel}>Total</Text>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadItems} />
-        }
-      >
-        {items.length > 0 ? (
-          <View style={styles.itemsGrid}>
-            {items.map((item, index) => renderItem(item, index))}
-          </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <ThemedText>
-              No items yet. Add your first item to start renting!
-            </ThemedText>
-          </View>
-        )}
-      </ScrollView>
-
-      <AddItemModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onItemAdded={handleItemAdded}
-      />
-    </ThemedView>
+        <AddItemModal
+          visible={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onItemAdded={handleItemAdded}
+        />
+      </ThemedView>
     </SafeAreaView>
   );
 }

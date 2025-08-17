@@ -1,37 +1,34 @@
 import { db } from '@/config/firebase';
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { ItemData } from '@/types/itemAttributes'; // Import from types
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { flattenAttributes, generateItemAttributes } from './attributeGenerator';
 
-export interface ItemData {
-  id?: string;
-  title: string;
-  description: string;
-  type: 'rent'; // Only rent now
-  rentPrice: number; // Required now
-  securityDeposit: number; // New required field
-  ownerId: string;
-  ownerUsername: string;
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  imageUrl?: string;
-  // Future fields for characteristics
-  // characteristics?: Record<string, any>;
-  brand?: string;
-  originalRetail?: number;
-  liked?: boolean;
-}
+// Remove the export { ItemData } if it exists, since it's now imported from types
 
-export const addItem = async (itemData: Omit<ItemData, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
-  const now = new Date().toISOString();
-  
-  const newItem: Omit<ItemData, 'id'> = {
-    ...itemData,
-    createdAt: now,
-    updatedAt: now,
-  };
-  
-  const docRef = await addDoc(collection(db, 'items'), newItem);
-  return docRef.id;
+export const addItem = async (itemData: Omit<ItemData, 'id' | 'createdAt' | 'updatedAt' | 'attributes' | 'embedding'>): Promise<void> => {
+  try {
+    const now = new Date().toISOString();
+    
+    // Generate attributes based on title and description
+    const attributes = generateItemAttributes(itemData.title, itemData.description);
+    
+    // Create embedding vector
+    const embedding = flattenAttributes(attributes);
+    
+    // Add item to items collection with attributes included
+    const itemsRef = collection(db, 'items');
+    await addDoc(itemsRef, {
+      ...itemData,
+      attributes,
+      embedding,
+      createdAt: now,
+      updatedAt: now,
+    });
+    
+  } catch (error) {
+    console.error('Error adding item:', error);
+    throw error;
+  }
 };
 
 export const getUserItems = async (userId: string): Promise<ItemData[]> => {
@@ -66,4 +63,19 @@ export const updateItem = async (itemId: string, updates: Partial<ItemData>) => 
 
 export const deleteItem = async (itemId: string) => {
   await deleteDoc(doc(db, 'items', itemId));
+};
+
+export const getItemById = async (itemId: string): Promise<ItemData | null> => {
+  try {
+    const itemRef = doc(db, 'items', itemId);
+    const itemDoc = await getDoc(itemRef);
+    
+    if (itemDoc.exists()) {
+      return { id: itemDoc.id, ...itemDoc.data() } as ItemData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching item:', error);
+    return null;
+  }
 };
