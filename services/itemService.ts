@@ -16,6 +16,9 @@ export interface ItemData {
   imageUrl?: string;
   // Future fields for characteristics
   // characteristics?: Record<string, any>;
+  brand?: string;
+  originalRetail?: number;
+  liked?: boolean;
 }
 
 export const addItem = async (itemData: Omit<ItemData, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {

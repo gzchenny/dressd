@@ -3,28 +3,32 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
+  FlatList,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { getAllActiveItems, ItemData } from "@/services/itemService";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ProductCard } from "@/components/ProductCard";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { getAllActiveItems, ItemData } from "@/services/itemService";
 
 const { width } = Dimensions.get("window");
-const itemWidth = (width - 60) / 2; // 2 columns with padding
+const cardWidth = width * 0.45; // Reduced from 0.72 to 0.45 to fit ~2.5 cards
+const gridItemWidth = (width - 20) / 2; // 2 columns with padding
 
 export default function HomeScreen() {
   const [items, setItems] = useState<ItemData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
 
   const loadItems = async (isRefresh = false) => {
     try {
@@ -34,14 +38,19 @@ export default function HomeScreen() {
         setLoading(true);
       }
 
-      setError(null);
-      console.log("Loading all active items...");
       const allItems = await getAllActiveItems();
-      console.log("Loaded items:", allItems);
-      setItems(allItems);
+      
+      // Transform items to include mock data for enhanced UI
+      const enhancedItems = allItems.map(item => ({
+        ...item,
+        brand: item.ownerUsername || "Designer",
+        originalRetail: item.rentPrice ? item.rentPrice * 5 : undefined,
+        liked: likedItems.has(item.id || ""),
+      }));
+      
+      setItems(enhancedItems);
     } catch (error) {
       console.error("Error loading items:", error);
-      setError("Failed to load items. Pull to refresh.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -52,255 +61,273 @@ export default function HomeScreen() {
     loadItems();
   }, []);
 
-  const handleRefresh = () => {
-    loadItems(true);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // TODO: Implement search filtering
   };
 
-  const renderItem = (item: ItemData, index: number) => (
-    <TouchableOpacity key={item.id || index} style={styles.itemCard}>
-      {item.imageUrl ? (
-        <Image
-          source={{ uri: item.imageUrl }}
-          style={styles.itemImage}
-          contentFit="cover"
-          placeholder={{ blurhash: "LGF5]+Yk^6#M@-5c,1J5@[or[Q6." }}
-          transition={200}
-        />
-      ) : (
-        <View style={[styles.itemImage, styles.placeholderImage]}>
-          <Text style={styles.placeholderText}>No Image</Text>
-        </View>
-      )}
+  const handleItemPress = (id: string) => {
+    console.log("Item pressed:", id);
+    // TODO: Navigate to item details
+  };
 
-      <View style={styles.itemContent}>
-        <Text style={styles.itemTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
+  const handleToggleLike = (id: string, liked: boolean) => {
+    const newLikedItems = new Set(likedItems);
+    if (liked) {
+      newLikedItems.add(id);
+    } else {
+      newLikedItems.delete(id);
+    }
+    setLikedItems(newLikedItems);
+    
+    // Update the items array to reflect the change
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, liked } : item
+      )
+    );
+  };
 
-        <Text style={styles.itemDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
+  const handleWishlist = () => {
+    console.log("Navigate to wishlist");
+    // TODO: Navigate to wishlist
+  };
 
-        <View style={styles.priceContainer}>
-          <Text style={styles.priceText}>${item.rentPrice}/day</Text>
-          <Text style={styles.depositText}>
-            Deposit: ${item.securityDeposit}
-          </Text>
-        </View>
+  const handleCart = () => {
+    console.log("Navigate to cart");
+    // TODO: Navigate to cart
+  };
 
-        <View style={styles.itemFooter}>
-          <View style={styles.typeTag}>
-            <Text style={styles.typeTagText}>For Rent</Text>
-          </View>
+  const handleShowTrending = () => {
+    console.log("Show more trending items");
+    // TODO: Navigate to trending page
+  };
 
-          <Text style={styles.ownerText}>by {item.ownerUsername}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+  // Split items for different sections
+  const personalizedItems = items.slice(0, 8);
+  const trendingItems = items.slice(0, 6);
+
+  const renderPersonalizedItem = ({ item }: { item: ItemData }) => (
+    <ProductCard
+      id={item.id || ""}
+      imageUrl={item.imageUrl}
+      brand={item.brand || "Designer"}
+      name={item.title}
+      priceFrom={item.rentPrice}
+      withMembershipFrom={0}
+      originalRetail={item.originalRetail}
+      liked={item.liked || false}
+      onPress={handleItemPress}
+      onToggleLike={handleToggleLike}
+      style={{ width: cardWidth, marginRight: 4 }} // Reduced marginRight from 12 to 8
+    />
   );
 
-  if (loading && !refreshing) {
+  const renderTrendingItem = ({ item }: { item: ItemData }) => (
+    <ProductCard
+      id={item.id || ""}
+      imageUrl={item.imageUrl}
+      brand={item.brand || "Designer"}
+      name={item.title}
+      priceFrom={item.rentPrice}
+      originalRetail={item.originalRetail}
+      liked={item.liked || false}
+      onPress={handleItemPress}
+      onToggleLike={handleToggleLike}
+      style={{ width: gridItemWidth }}
+    />
+  );
+
+  if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <ThemedText type="title">Welcome to Dressd.</ThemedText>
-          <Text style={styles.subtitle}>Discover amazing fashion items</Text>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+        <View style={styles.appBar}>
+          <ThemedText type="title" style={styles.logo}>dressd</ThemedText>
+          <View style={styles.appBarActions}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleWishlist}>
+              <IconSymbol name="heart" size={24} color="#111" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={handleCart}>
+              <IconSymbol name="bag.fill" size={24} color="#111" />
+            </TouchableOpacity>
+          </View>
         </View>
+        
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#111" />
           <Text style={styles.loadingText}>Loading items...</Text>
         </View>
-      </ThemedView>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="title">Welcome to Dressd.</ThemedText>
-        <Text style={styles.subtitle}>Discover amazing fashion items</Text>
-        <Text style={styles.itemCount}>
-          {items.length} item{items.length !== 1 ? "s" : ""} available
-        </Text>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      {/* App Bar */}
+      <View style={styles.appBar}>
+        <ThemedText type="title" style={styles.logo}>dressd</ThemedText>
+        <View style={styles.appBarActions}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleWishlist}>
+            <IconSymbol name="heart" size={24} color="#111" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={handleCart}>
+            <IconSymbol name="bag.fill" size={24} color="#111" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {error ? (
-          <View style={styles.errorState}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={() => loadItems()}
-            >
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
-        ) : items.length > 0 ? (
-          <View style={styles.itemsGrid}>
-            {items.map((item, index) => renderItem(item, index))}
-          </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <ThemedText>
-              No items available yet. Be the first to add one!
-            </ThemedText>
-          </View>
-        )}
-      </ScrollView>
-    </ThemedView>
-    </SafeAreaView>
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <IconSymbol name="magnifyingglass" size={20} color="#555" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search dresses, designers, sizes"
+            placeholderTextColor="#555"
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+        </View>
+      </View>
 
+      <FlatList
+        data={[]}
+        renderItem={() => null}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={() => loadItems(true)} />
+        }
+        contentContainerStyle={{ paddingBottom: 48 }} // Add this line
+        ListHeaderComponent={
+          <View>
+            {/* For You Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>For you</Text>
+              </View>
+              <FlatList
+                data={personalizedItems}
+                renderItem={renderPersonalizedItem}
+                keyExtractor={(item) => item.id || ""}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={cardWidth + 4}
+                decelerationRate="fast"
+                contentContainerStyle={styles.horizontalList}
+              />            
+            </View>
+            {/* Trending Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Trending</Text>
+                <TouchableOpacity onPress={handleShowTrending}>
+                  <Text style={styles.moreButton}>More</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <FlatList
+                data={trendingItems}
+                renderItem={renderTrendingItem}
+                keyExtractor={(item) => item.id || ""}
+                numColumns={2}
+                scrollEnabled={false}
+                columnWrapperStyle={styles.gridRow}
+                contentContainerStyle={styles.grid}
+              />
+            </View>
+          </View>
+        }
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#fff',
   },
-  header: {
-    marginBottom: 20,
+  appBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    height: 56,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#eee',
   },
-  subtitle: {
+  logo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#653A79',
+  },
+  appBarActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+    // Remove borderRadius to make it a complete rectangle
+  },
+  searchInput: {
+    flex: 1,
     fontSize: 16,
-    color: "#666",
-    marginTop: 4,
-    marginBottom: 8,
+    color: '#111',
+    backgroundColor: 'transparent', // Fix yellow background issue
   },
-  itemCount: {
-    fontSize: 14,
-    color: "#007AFF",
-    fontWeight: "500",
+  section: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111',
+  },
+  moreButton: {
+    fontSize: 16,
+    color: '#111',
+    textDecorationLine: 'underline',
+  },
+  horizontalList: {
+    paddingLeft: 1,
+  },
+  grid: {
+    paddingHorizontal: 16,
+  },
+  gridRow: {
+    justifyContent: 'space-between',
+    marginBottom: 8, // Reduced gap between rows
+    paddingHorizontal: 8, // Add horizontal padding for grid items
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
     marginTop: 10,
-    color: "#666",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  itemsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  itemCard: {
-    width: itemWidth,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  itemImage: {
-    width: "100%",
-    height: 150,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-  },
-  placeholderImage: {
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    color: "#999",
-    fontSize: 12,
-  },
-  itemContent: {
-    padding: 12,
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
-    color: "#333",
-  },
-  itemDescription: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 8,
-    lineHeight: 16,
-  },
-  priceContainer: {
-    marginBottom: 8,
-  },
-  priceText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#28a745",
-  },
-  depositText: {
-    fontSize: 12,
-    color: "#dc3545",
-  },
-  itemFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  typeTag: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  typeTagText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
-  },
-  ownerText: {
-    fontSize: 10,
-    color: "#999",
-    flex: 1,
-    textAlign: "right",
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 100,
-  },
-  errorState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 100,
-  },
-  errorText: {
-    color: "#dc3545",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  retryButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#666',
   },
 });

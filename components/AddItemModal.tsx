@@ -2,7 +2,7 @@ import { auth } from "@/config/firebase";
 import { addItem, ItemData } from "@/services/itemService";
 import { addItemToUser, getUserProfile } from "@/services/userService";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   Image,
@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 
 interface AddItemModalProps {
   visible: boolean;
@@ -39,7 +40,12 @@ export default function AddItemModal({
     setRentPrice("");
     setSecurityDeposit("");
     setImageUri(null);
+    // Force a small delay to let iOS clear autofill state
+    setTimeout(() => {
+      console.log('Form reset completed');
+    }, 100);
   };
+
 
   const pickImage = async () => {
     // Request permission to access media library
@@ -213,20 +219,44 @@ export default function AddItemModal({
               onChangeText={setTitle}
               placeholder="e.g., Designer Evening Dress"
               maxLength={100}
+              // Comprehensive iOS autofill prevention:
+              autoComplete="off"
+              autoCorrect={false}
+              spellCheck={false}
+              textContentType="none"
+              passwordRules=""
+              keyboardType="default"
+              // Force clear background:
+              selectionColor="#007AFF"
+              placeholderTextColor="#999"
+              // Prevent any form associations:
+              importantForAutofill="no"
+              clearButtonMode="never"
+              autoCapitalize="sentences"
+              // Force re-render key to break autofill cache:
+              key={`title-${visible}`}
+            
             />
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.label}>Description</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Describe your item: size, color, brand, condition..."
-              multiline
-              numberOfLines={4}
-              maxLength={500}
-            />
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Describe your item: size, color, brand, condition..."
+            multiline
+            numberOfLines={4}
+            maxLength={500}
+            // Same autofill prevention:
+            autoComplete="off"
+            autoCorrect={false}
+            spellCheck={false}
+            textContentType="none"
+            selectionColor="#007AFF"
+            placeholderTextColor="#999"
+            importantForAutofill="no"
+          />
           </View>
 
           <View style={styles.section}>
@@ -273,20 +303,35 @@ export default function AddItemModal({
               onChangeText={setRentPrice}
               placeholder="25.00"
               keyboardType="decimal-pad"
+              // Autofill prevention:
+              autoComplete="off"
+              textContentType="none"
+              selectionColor="#007AFF"
+              placeholderTextColor="#999"
+              importantForAutofill="no"
             />
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>Security Deposit ($)</Text>
-            <TextInput
-              style={styles.input}
-              value={securityDeposit}
-              onChangeText={setSecurityDeposit}
-              placeholder="100.00"
-              keyboardType="decimal-pad"
-            />
+              <TextInput
+                style={styles.input}
+                value={securityDeposit}
+                onChangeText={setSecurityDeposit}
+                placeholder="100.00"
+                keyboardType="decimal-pad"
+                // Autofill prevention:
+                autoComplete="off"
+                textContentType="none"
+                selectionColor="#007AFF"
+                placeholderTextColor="#999"
+                importantForAutofill="no"
+                clearButtonMode="never"
+                autoCapitalize="sentences"
+                key={`description-${visible}`}              
+                />            
             <Text style={styles.helperText}>
-              Refundable deposit to protect against damage or loss
+            Refundable deposit to protect against damage or loss
             </Text>
           </View>
         </ScrollView>
@@ -340,10 +385,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    // Force white background and dark text:
+    backgroundColor: '#FFFFFF',
+    color: '#000000',
+    // Additional iOS fixes:
+    textAlign: 'left',
+    textAlignVertical: 'center',
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
+    backgroundColor: '#FFFFFF',
   },
   helperText: {
     fontSize: 12,
