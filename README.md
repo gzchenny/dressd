@@ -31,7 +31,7 @@ note: to use the upload image feature, you will need to get your own api key for
 
 EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY="KEY HERE"
 
-Ensure you have Expo installed.
+Ensure you have Expo installed. You can scan the QR code in the terminal with your phone.
 
 1. Install dependencies
 
