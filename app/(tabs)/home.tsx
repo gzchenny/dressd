@@ -21,6 +21,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { getAllActiveItems, ItemData } from "@/services/itemService";
 import { addToWishlist, removeFromWishlist, getLikedItemIds } from "@/services/wishlistService";
 import { router } from "expo-router";
+import { AppBar } from "@/components/AppBar";
 
 const { width } = Dimensions.get("window");
 const cardWidth = width * 0.45; // Reduced from 0.72 to 0.45 to fit ~2.5 cards
@@ -167,17 +168,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-        <View style={styles.appBar}>
-          <ThemedText type="title" style={styles.logo}>dressd</ThemedText>
-          <View style={styles.appBarActions}>
-            <TouchableOpacity style={styles.iconButton} onPress={handleWishlist}>
-              <IconSymbol name="heart" size={24} color="#111" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={handleCart}>
-              <IconSymbol name="bag.fill" size={24} color="#111" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <AppBar title="dressd" />
         
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#111" />
@@ -189,18 +180,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      {/* App Bar */}
-      <View style={styles.appBar}>
-        <ThemedText type="title" style={styles.logo}>dressd</ThemedText>
-        <View style={styles.appBarActions}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleWishlist}>
-            <IconSymbol name="heart" size={24} color="#111" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={handleCart}>
-            <IconSymbol name="bag.fill" size={24} color="#111" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <AppBar title="dressd" />
 
       {/* Search */}
       <View style={styles.searchContainer}>
@@ -271,31 +251,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  appBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    height: 56,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#eee',
-  },
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#653A79',
-  },
-  appBarActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   searchContainer: {
     paddingHorizontal: 16,

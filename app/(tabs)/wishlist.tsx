@@ -15,6 +15,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { getAllActiveItems, ItemData } from "@/services/itemService";
 import { getLikedItemIds, removeFromWishlist } from "@/services/wishlistService";
+import { AppBar } from "@/components/AppBar";
 
 export default function WishlistScreen() {
   const [wishlistItems, setWishlistItems] = useState<ItemData[]>([]);
@@ -104,9 +105,7 @@ export default function WishlistScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-        <View style={styles.header}>
-          <ThemedText type="title" style={styles.title}>Wishlist</ThemedText>
-        </View>
+        <AppBar title="Wishlist" />
         <View style={styles.loadingContainer}>
           <Text>Loading wishlist...</Text>
         </View>
@@ -116,8 +115,9 @@ export default function WishlistScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <AppBar title="Wishlist" />
+      
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.title}>Wishlist</ThemedText>
         <Text style={styles.itemCount}>{wishlistItems.length} items</Text>
       </View>
 
@@ -150,18 +150,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#eee',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#653A79',
   },
   itemCount: {
     fontSize: 16,

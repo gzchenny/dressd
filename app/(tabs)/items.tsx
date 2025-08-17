@@ -19,8 +19,7 @@ import { auth } from "@/config/firebase";
 import { getUserItems, ItemData, updateItem } from "@/services/itemService";
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-
+import { AppBar } from "@/components/AppBar";
 
 const { width } = Dimensions.get("window");
 const itemWidth = (width - 60) / 2;
@@ -50,6 +49,10 @@ export default function ItemsScreen() {
 
   const handleItemAdded = () => {
     loadItems(); // Refresh the list
+  };
+
+  const handleAddItem = () => {
+    setShowAddModal(true);
   };
 
   const toggleItemStatus = async (item: ItemData) => {
@@ -156,63 +159,61 @@ export default function ItemsScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="title">My Items</ThemedText>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
-        >
-          <IconSymbol name="house.fill" size={20} color="#fff" />
-          <Text style={styles.addButtonText}>Add Item</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {items.filter((item) => item.isActive).length}
-          </Text>
-          <Text style={styles.statLabel}>Active</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {items.filter((item) => !item.isActive).length}
-          </Text>
-          <Text style={styles.statLabel}>Inactive</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{items.length}</Text>
-          <Text style={styles.statLabel}>Total</Text>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadItems} />
-        }
-      >
-        {items.length > 0 ? (
-          <View style={styles.itemsGrid}>
-            {items.map((item, index) => renderItem(item, index))}
-          </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <ThemedText>
-              No items yet. Add your first item to start renting!
-            </ThemedText>
-          </View>
-        )}
-      </ScrollView>
-
-      <AddItemModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onItemAdded={handleItemAdded}
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <AppBar 
+        title="My Items" 
+        rightButton={{ 
+          icon: "house.fill", 
+          text: "Add Item", 
+          onPress: handleAddItem 
+        }} 
       />
-    </ThemedView>
+      
+      <ThemedView style={styles.content}>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>
+              {items.filter((item) => item.isActive).length}
+            </Text>
+            <Text style={styles.statLabel}>Active</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>
+              {items.filter((item) => !item.isActive).length}
+            </Text>
+            <Text style={styles.statLabel}>Inactive</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{items.length}</Text>
+            <Text style={styles.statLabel}>Total</Text>
+          </View>
+        </View>
+
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={loadItems} />
+          }
+        >
+          {items.length > 0 ? (
+            <View style={styles.itemsGrid}>
+              {items.map((item, index) => renderItem(item, index))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <ThemedText>
+                No items yet. Add your first item to start renting!
+              </ThemedText>
+            </View>
+          )}
+        </ScrollView>
+
+        <AddItemModal
+          visible={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onItemAdded={handleItemAdded}
+        />
+      </ThemedView>
     </SafeAreaView>
   );
 }
@@ -220,26 +221,11 @@ export default function ItemsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
     padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  addButton: {
-    backgroundColor: "#007AFF",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    gap: 8,
-  },
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
   },
   statsContainer: {
     flexDirection: "row",
@@ -255,7 +241,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#007AFF",
+    color: "#653A79",
   },
   statLabel: {
     fontSize: 12,
@@ -331,7 +317,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   typeTag: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#653A79",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
