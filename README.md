@@ -8,13 +8,13 @@
 
 - **Browse & Search:** Explore trending and personalised items on the home screen.
 
-- **Wishlist:** Heart items to save them for later ([`app/(tabs)/wishlist.tsx`](app/(tabs)/wishlist.tsx)).
+- **Wishlist:** Heart items to save them for later ([`app/(tabs)/wishlist.tsx`](<app/(tabs)/wishlist.tsx>)).
 
-- **Cart & Checkout:** Add items to your cart and complete secure checkout ([`app/(tabs)/cart.tsx`](app/(tabs)/cart.tsx), [`app/checkout.tsx`](app/checkout.tsx)).
+- **Cart & Checkout:** Add items to your cart and complete secure checkout ([`app/(tabs)/cart.tsx`](<app/(tabs)/cart.tsx>), [`app/checkout.tsx`](app/checkout.tsx)).
 
-- **List Your Items:** Add your own fashion pieces for rent ([`components/AddItemModal.tsx`](components/AddItemModal.tsx), [`app/(tabs)/items.tsx`](app/(tabs)/items.tsx)).
+- **List Your Items:** Add your own fashion pieces for rent ([`components/AddItemModal.tsx`](components/AddItemModal.tsx), [`app/(tabs)/items.tsx`](<app/(tabs)/items.tsx>)).
 
-- **Style Preferences:** Upload style photos to get personalized recommendations ([`app/(tabs)/styles.tsx`](app/(tabs)/styles.tsx)).
+- **Style Preferences:** Upload style photos to get personalised recommendations ([`app/(tabs)/styles.tsx`](<app/(tabs)/styles.tsx>)).
 
 - **Profile & Authentication:** Sign up, log in, and manage your profile ([`app/signup.tsx`](app/signup.tsx), [`app/login.tsx`](app/login.tsx)).
 
@@ -25,6 +25,8 @@
 ---
 
 ## Get started
+
+note: to use the upload image feature, you will need to get your own api key for google cloud vision api and set it up in the project config.
 
 1. Install dependencies
 
@@ -41,6 +43,7 @@
 ---
 
 ## Project Structure
+
 app/: Screens and file-based routing
 Home, Wishlist, Cart, Items, Styles, Product Details, Auth
 
@@ -57,7 +60,8 @@ config/: Firebase config
 assets/: Images and fonts
 
 ## Key Screens
-app/(tabs)/home.tsx: Trending & personalized feed
+
+app/(tabs)/home.tsx: Trending & personalised feed
 
 app/(tabs)/wishlist.tsx: Wishlist management
 
@@ -72,6 +76,7 @@ app/product/[id].tsx: Product details & rental calendar
 app/signup.tsx, app/login.tsx: Authentication
 
 ## Authentication
+
 Firebase Auth (config/firebase.js)
 
 Sign up and log in screens
@@ -79,11 +84,13 @@ Sign up and log in screens
 User profile creation (services/userService.ts)
 
 ## Personalisation
+
 Upload style photos (app/(tabs)/styles.tsx)
 
 Embedding-based recommendations (services/embeddingService.ts)
 
 ## Development Notes
+
 File-based routing via Expo Router
 
 Custom hooks and UI components
@@ -93,22 +100,29 @@ All business logic in /services
 TypeScript throughout
 
 ## Resetting the Project
+
 To start fresh, run:
+
 ```
 npm run reset-project
 ```
+
 Moves starter code to /app-example and creates a blank /app directory.
 
 ## Learn More
+
 Expo documentation
 Expo Router
 Firebase
 
 ## Hackathon Team
+
 Built for FoundersHack by Team Andreprenuers
 
 ## Contributing
+
 We welcome pull questions. For questions, open an issue or contact the team.
 
 ## License
+
 For FoundersHack hackathon use only

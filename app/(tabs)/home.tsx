@@ -45,6 +45,7 @@ export default function HomeScreen() {
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
   const [hasPreferences, setHasPreferences] = useState(false);
 
+  // load items and personalize based on user preferences
   const loadItems = async (isRefresh = false) => {
     try {
       if (isRefresh) {
@@ -59,19 +60,18 @@ export default function HomeScreen() {
         getUserPreferences(),
       ]);
 
-      // Transform items to include mock data for enhanced UI
+      // enhance items with display info and liked status
       const enhancedItems = allItems.map((item) => ({
         ...item,
         brand: item.ownerUsername || "Designer",
         originalRetail: item.rentPrice ? item.rentPrice * 5 : undefined,
         liked: likedItemIds.includes(item.id || ""),
-        // Use real embeddings from database (no more mock generation)
       }));
 
       setItems(enhancedItems);
       setLikedItems(new Set(likedItemIds));
 
-      // Generate personalized recommendations with real embeddings
+      // personalize recommendations if user has style preferences
       if (userPreferences?.embedding) {
         setHasPreferences(true);
         const itemsWithSimilarity = enhancedItems
@@ -79,11 +79,12 @@ export default function HomeScreen() {
           .map((item) => ({
             ...item,
             similarity: calculateSimilarity(
-              userPreferences.embedding!, // This should now be the combinedEmbedding
+              userPreferences.embedding!,
               item.embedding!
             ),
           }));
 
+        // sort by similarity and take top 8
         const sortedPersonalized = itemsWithSimilarity
           .sort((a, b) => (b.similarity || 0) - (a.similarity || 0))
           .slice(0, 8);
@@ -105,7 +106,7 @@ export default function HomeScreen() {
     loadItems();
   }, []);
 
-  // Add focus effect to refresh data when navigating to this screen
+  // refresh when user comes back to home screen
   useFocusEffect(
     useCallback(() => {
       console.log("Home screen focused, refreshing items...");
@@ -113,6 +114,7 @@ export default function HomeScreen() {
     }, [])
   );
 
+  // handle like/unlike with wishlist sync
   const handleToggleLike = async (id: string, liked: boolean) => {
     console.log(`Toggling like for item ${id}: ${liked}`);
 
@@ -129,7 +131,7 @@ export default function HomeScreen() {
         console.log(`Successfully removed item ${id} from wishlist`);
       }
 
-      // Update state immediately for instant UI feedback
+      // update local state for immediate feedback
       setLikedItems(newLikedItems);
       setItems((prevItems) =>
         prevItems.map((item) => (item.id === id ? { ...item, liked } : item))
@@ -139,14 +141,13 @@ export default function HomeScreen() {
       );
     } catch (error) {
       console.error(`Error toggling like for item ${id}:`, error);
-      // Revert UI state on error
+      // fallback to reload if sync fails
       loadItems();
     }
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // TODO: Implement search filtering
   };
 
   const handleItemPress = (id: string) => {
@@ -161,18 +162,17 @@ export default function HomeScreen() {
 
   const handleCart = () => {
     console.log("Navigate to cart");
-    // TODO: Navigate to cart
   };
 
   const handleShowTrending = () => {
     console.log("Show more trending items");
-    // TODO: Navigate to trending page
   };
 
   const handleAddPreferences = () => {
     router.push("/(tabs)/settings");
   };
 
+  // just grab first 6 items for trending section
   const trendingItems = items.slice(0, 6);
 
   const renderPersonalizedItem = ({ item }: { item: ItemWithSimilarity }) => (
@@ -223,7 +223,6 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppBar title="dress." />
 
-      {/* Search */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <IconSymbol name="magnifyingglass" size={20} color="#555" />
@@ -246,10 +245,9 @@ export default function HomeScreen() {
             onRefresh={() => loadItems(true)}
           />
         }
-        contentContainerStyle={{ paddingBottom: 48 }} // Add this line
+        contentContainerStyle={{ paddingBottom: 48 }}
         ListHeaderComponent={
           <View>
-            {/* Personalized Section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
@@ -281,7 +279,6 @@ export default function HomeScreen() {
               />
             </View>
 
-            {/* Trending Section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Trending</Text>

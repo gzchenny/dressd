@@ -14,7 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// prevent splash screen from auto-hiding before assets load
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -37,6 +37,7 @@ export default function RootLayout() {
     return null;
   }
 
+  // custom theme configurations for light and dark modes
   const lightNavTheme = {
     ...DefaultTheme,
     colors: {
@@ -71,11 +72,12 @@ export default function RootLayout() {
           name="login"
           options={{ title: "Sign In", headerBackTitle: "Back" }}
         />
+        {/* // product detail screen with modal presentation */}
         <Stack.Screen
           name="product/[id]"
           options={{
             headerShown: false,
-            presentation: "modal", // Optional: makes it slide up from bottom
+            presentation: "modal",
           }}
         />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -113,10 +115,11 @@ export function TabLayout() {
           ),
         }}
       />
+      {/* // hidden from tab bar navigation */}
       <Tabs.Screen
         name="wishlist"
         options={{
-          href: null, // Hidden from tab bar
+          href: null,
         }}
       />
       <Tabs.Screen

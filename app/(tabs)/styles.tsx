@@ -24,6 +24,7 @@ export default function StylesScreen() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  // track component mount state to avoid memory leaks
   useEffect(() => {
     setIsMounted(true);
     return () => setIsMounted(false);
@@ -52,6 +53,7 @@ export default function StylesScreen() {
     }
   };
 
+  // let user pick and analyze a style photo
   const addPhoto = async () => {
     try {
       const permissionResult =
@@ -76,6 +78,7 @@ export default function StylesScreen() {
         setLoading(true);
 
         try {
+          // send photo for AI analysis and embedding generation
           await addPreferencePhoto(result.assets[0].uri);
           await loadPreferences();
           Alert.alert("Success", "Style photo added and analyzed!");
@@ -109,7 +112,6 @@ export default function StylesScreen() {
     }
   };
 
-  // Don't render anything until mounted
   if (!isMounted) {
     return null;
   }
@@ -166,6 +168,7 @@ export default function StylesScreen() {
               </TouchableOpacity>
             ))}
 
+            {/* add new photo button */}
             <TouchableOpacity
               style={[styles.addPhotoButton, { opacity: loading ? 0.5 : 1 }]}
               onPress={addPhoto}
@@ -188,6 +191,7 @@ export default function StylesScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* show status if user has active preferences */}
           {preferences?.embedding && (
             <View style={styles.embeddingInfo}>
               <ThemedText style={styles.embeddingText}>

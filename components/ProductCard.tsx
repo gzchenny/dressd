@@ -1,3 +1,6 @@
+// displays each product as a card
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { formatPrice } from "@/utils/money";
 import { Image } from "expo-image";
 import React from "react";
 import {
@@ -7,8 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { formatPrice } from "@/utils/money";
 
 interface ProductCardProps {
   id: string;
@@ -37,16 +38,19 @@ export function ProductCard({
   onToggleLike,
   style,
 }: ProductCardProps) {
-  const accessibilityLabel = `${brand} ${name}. Rent from ${formatPrice(priceFrom)}${
-    withMembershipFrom === 0 ? ". With membership zero" : ""
-  }${originalRetail ? `. Original retail ${formatPrice(originalRetail)}` : ""}`;
+  // accessibility label for screen readers
+  const accessibilityLabel = `${brand} ${name}. Rent from ${formatPrice(
+    priceFrom
+  )}${withMembershipFrom === 0 ? ". With membership zero" : ""}${
+    originalRetail ? `. Original retail ${formatPrice(originalRetail)}` : ""
+  }`;
 
   return (
     <Pressable
       style={[styles.card, style]}
       onPress={() => onPress(id)}
       accessibilityLabel={accessibilityLabel}
-      android_ripple={{ color: 'rgba(0,0,0,0.1)' }}
+      android_ripple={{ color: "rgba(0,0,0,0.1)" }}
     >
       <View style={styles.imageContainer}>
         {imageUrl ? (
@@ -59,11 +63,12 @@ export function ProductCard({
         ) : (
           <View style={[styles.image, styles.placeholderImage]}>
             <Text style={styles.placeholderText}>
-              {brand.charAt(0)}{name.charAt(0)}
+              {brand.charAt(0)}
+              {name.charAt(0)}
             </Text>
           </View>
         )}
-        
+        {/* heart button overlays image */}
         <TouchableOpacity
           style={styles.heartButton}
           onPress={() => onToggleLike(id, !liked)}
@@ -84,15 +89,12 @@ export function ProductCard({
         <Text style={styles.name} numberOfLines={2}>
           {name}
         </Text>
-        
         <View style={styles.pricing}>
           <Text style={styles.rentPrice}>
             Rent from {formatPrice(priceFrom)}
           </Text>
           {withMembershipFrom === 0 && (
-            <Text style={styles.membershipPrice}>
-              With membership $0
-            </Text>
+            <Text style={styles.membershipPrice}>With membership $0</Text>
           )}
           {originalRetail && (
             <Text style={styles.originalRetail}>
@@ -106,71 +108,71 @@ export function ProductCard({
 }
 
 const styles = StyleSheet.create({
-    card: {
-      backgroundColor: '#fff',
-      // Remove borderRadius to make complete rectangles
-      overflow: 'hidden',
-    },
-    imageContainer: {
-      position: 'relative',
-      aspectRatio: 3/4,
-    },
-    image: {
-      width: '100%',
-      height: '100%',
-      // Remove borderRadius to make complete rectangles
-    },
-    placeholderImage: {
-      backgroundColor: '#eee',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    placeholderText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#999',
-    },
-    heartButton: {
-      position: 'absolute',
-      top: 8,
-      right: 8,
-      width: 44,
-      height: 44,
-      borderRadius: 22, // Keep heart button rounded
-      backgroundColor: 'rgba(0,0,0,0.3)',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    content: {
-      padding: 8, // Reduced padding for tighter layout
-    },
-    brand: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: '#111',
-      marginBottom: 2,
-    },
-    name: {
-      fontSize: 12,
-      color: '#111',
-      lineHeight: 16,
-      marginBottom: 6, // Reduced margin
-    },
-    pricing: {
-      gap: 1, // Reduced gap between price lines
-    },
-    rentPrice: {
-      fontSize: 12,
-      fontWeight: 'bold',
-      color: '#111',
-    },
-    membershipPrice: {
-      fontSize: 11,
-      color: '#28a745',
-      fontWeight: '500',
-    },
-    originalRetail: {
-      fontSize: 10,
-      color: '#555',
-    },
-  });
+  card: {
+    backgroundColor: "#fff",
+    // rectangles only, no border radius
+    overflow: "hidden",
+  },
+  imageContainer: {
+    position: "relative",
+    aspectRatio: 3 / 4,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    // rectangles only, no border radius
+  },
+  placeholderImage: {
+    backgroundColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#999",
+  },
+  heartButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 22, // keep heart button round
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  content: {
+    padding: 8, // tighter layout
+  },
+  brand: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#111",
+    marginBottom: 2,
+  },
+  name: {
+    fontSize: 12,
+    color: "#111",
+    lineHeight: 16,
+    marginBottom: 6, // less margin
+  },
+  pricing: {
+    gap: 1, // less gap between price lines
+  },
+  rentPrice: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#111",
+  },
+  membershipPrice: {
+    fontSize: 11,
+    color: "#28a745",
+    fontWeight: "500",
+  },
+  originalRetail: {
+    fontSize: 10,
+    color: "#555",
+  },
+});

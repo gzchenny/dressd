@@ -21,18 +21,16 @@ export default function WishlistScreen() {
   const [wishlistItems, setWishlistItems] = useState<ItemData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load wishlist items from AsyncStorage or your preferred storage
+  // grab all the wishlist items and match them with active items
   const loadWishlistItems = async () => {
     console.log('Loading wishlist items...');
     try {
-      // Get liked item IDs from storage (we'll implement this)
       const likedItemIds = await getLikedItemIds();
       console.log('Found liked item IDs:', likedItemIds);
       
-      // Get all active items
       const allItems = await getAllActiveItems();
       
-      // Filter items that are in wishlist
+      // filter and enhance the items for display
       const wishlistItems = allItems.filter(item => 
         likedItemIds.includes(item.id || "")
       ).map(item => ({
@@ -55,7 +53,7 @@ export default function WishlistScreen() {
     loadWishlistItems();
   }, []);
 
-  // Add focus effect to refresh data when navigating to this screen
+  // refresh when user navigates back to this screen
   useFocusEffect(
     useCallback(() => {
       console.log('Wishlist screen focused, refreshing items...');
@@ -65,24 +63,23 @@ export default function WishlistScreen() {
 
   const handleItemPress = (id: string) => {
     console.log("Wishlist item pressed:", id);
-    // TODO: Navigate to item details
   };
 
+  // remove item from wishlist and update local state
   const handleRemoveFromWishlist = async (id: string) => {
     console.log(`Removing item ${id} from wishlist`);
     
     try {
-      // Remove from wishlist storage first
       await removeFromWishlist(id);
       console.log(`Successfully removed item ${id} from wishlist storage`);
       
-      // Update local state immediately for instant UI feedback
+      // update local state immediatly for better UX
       setWishlistItems(prevItems => 
         prevItems.filter(item => item.id !== id)
       );
     } catch (error) {
       console.error(`Error removing item ${id} from wishlist:`, error);
-      // Reload data on error to ensure consistency
+      // fallback to full reload if something goes wrong
       loadWishlistItems();
     }
   };

@@ -1,3 +1,4 @@
+// import dependencies for login functionality
 import { auth } from "@/config/firebase";
 import { getUserProfile } from "@/services/userService";
 import { router } from "expo-router";
@@ -12,13 +13,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
 
+// login screen main component
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // handle sign in logic
   const handleSignIn = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in all fields");
@@ -34,6 +37,7 @@ export default function LoginScreen() {
       );
       const user = userCredential.user;
 
+      // fetch user profile after login
       const userProfile = await getUserProfile(user.uid);
 
       if (!userProfile) {
@@ -48,16 +52,19 @@ export default function LoginScreen() {
     }
   };
 
+  // main layout for login
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top', 'left', 'right']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      edges={["top", "left", "right"]}
+    >
       <View style={styles.container}>
-        {/* Replace the title text with your logo */}
-        <Image 
-          source={require('@/assets/images/logo.png')} // Update with your logo filename
+        // logo for branding
+        <Image
+          source={require("@/assets/images/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
-
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -67,7 +74,6 @@ export default function LoginScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
         />
-
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -76,7 +82,7 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-
+        // sign in button
         <TouchableOpacity
           style={[styles.button, { opacity: loading ? 0.6 : 1 }]}
           onPress={handleSignIn}
@@ -86,15 +92,16 @@ export default function LoginScreen() {
             {loading ? "Signing In..." : "Sign In"}
           </Text>
         </TouchableOpacity>
-
+        // link to signup page
         <TouchableOpacity onPress={() => router.push("/signup")}>
-          <Text style={styles.switchText}>Don't have an account? Sign Up</Text>
+          <Text style={styles.switchText}>dont have an account? Sign Up</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
+// styles for login layout and elements
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -103,14 +110,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logoContainer: {
-    paddingHorizontal: 0,  // Full width for logo
+    paddingHorizontal: 0,
     marginBottom: 40,
   },
   logo: {
-    width: '100%',        // Adjust width as needed
-    height: 320,        // Adjust height as needed
-    alignSelf: 'center',
-    marginBottom: 5,  // Space between logo and form
+    width: "100%",
+    height: 320,
+    alignSelf: "center",
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,

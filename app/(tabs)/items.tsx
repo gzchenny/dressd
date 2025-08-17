@@ -17,7 +17,7 @@ import { AppBar } from "@/components/AppBar";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { auth } from "@/config/firebase";
-import { getUserItems, ItemData, updateItem } from "@/services/itemService"; // Import ItemData from itemService
+import { getUserItems, ItemData, updateItem } from "@/services/itemService"; 
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
 
 const { width } = Dimensions.get("window");
@@ -54,6 +54,7 @@ export default function ItemsScreen() {
     setShowAddModal(true);
   };
 
+  // toggle between active and inactive status
   const toggleItemStatus = async (item: ItemData) => {
     if (!item.id) return;
 
@@ -65,6 +66,7 @@ export default function ItemsScreen() {
 
       await updateItem(item.id, { isActive: newStatus });
 
+      // update user's active/inactive lists
       if (newStatus) {
         await moveItemToActive(user.uid, item.id);
       } else {
@@ -145,7 +147,6 @@ export default function ItemsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      {/* AppBar with heart and cart icons by default, plus Add Item button */}
       <AppBar
         title="My Items"
         rightButton={{
@@ -159,6 +160,7 @@ export default function ItemsScreen() {
         lightColor="#ffffff"
         darkColor="#ffffff"
       >
+        {/* stats showing active, inactive, and total counts */}
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>

@@ -50,7 +50,7 @@ export default function SignUpScreen() {
 
     setLoading(true);
     try {
-      // Create Firebase user
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -58,7 +58,6 @@ export default function SignUpScreen() {
       );
       const user = userCredential.user;
 
-      // Create user profile in Firestore
       await createUserProfile(user.uid, {
         email,
         username,

@@ -1,3 +1,4 @@
+// navbar at thetop of the app
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';

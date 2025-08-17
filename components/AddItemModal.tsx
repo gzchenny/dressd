@@ -1,7 +1,7 @@
 import { auth } from "@/config/firebase";
 import {
-    createEmbeddingFromAttributes,
-    generateItemAttributes,
+  createEmbeddingFromAttributes,
+  generateItemAttributes,
 } from "@/services/attributeGenerator";
 import { addItem } from "@/services/itemService";
 import { addItemToUser } from "@/services/userService";
@@ -9,15 +9,15 @@ import { ItemData } from "@/types/itemAttributes";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface AddItemModalProps {
@@ -35,11 +35,10 @@ export default function AddItemModal({
   const [description, setDescription] = useState("");
   const [rentPrice, setRentPrice] = useState("");
   const [securityDeposit, setSecurityDeposit] = useState("");
-  const [imageUrl, setImageUrl] = useState<string>(""); // Keep this but hide the field
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [imageUri, setImageUri] = useState<string | null>(null); // Add this for local image URI
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
-  // Reset the form
   const resetForm = () => {
     setTitle("");
     setDescription("");
@@ -49,11 +48,10 @@ export default function AddItemModal({
     setImageUri(null);
   };
 
-  // Add this function to pick image from gallery
   const pickImage = async () => {
     try {
-      // Request permissions
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permissionResult.granted) {
         Alert.alert(
@@ -63,7 +61,6 @@ export default function AddItemModal({
         return;
       }
 
-      // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -72,11 +69,8 @@ export default function AddItemModal({
       });
 
       if (!result.canceled && result.assets[0]) {
-        // Set the local image URI for preview
         setImageUri(result.assets[0].uri);
-
-        // For demo purposes, we're using the local URI as the imageUrl
-        // In a real app, you'd upload this to storage and get a URL
+        // for demo purposes, we're using the local URI as the imageUrl
         setImageUrl(result.assets[0].uri);
       }
     } catch (error) {
@@ -85,9 +79,7 @@ export default function AddItemModal({
     }
   };
 
-  // Add logic to use hardcoded image URLs based on title
   useEffect(() => {
-    // Check for specific keywords in title and set corresponding image URLs
     const titleLower = title.toLowerCase();
 
     if (
@@ -137,11 +129,11 @@ export default function AddItemModal({
     try {
       console.log("Starting item creation...");
 
-      // Generate simple attributes from text
+      // generate simple attributes from text
       const attributes = generateItemAttributes(title, description);
       console.log("Generated attributes:", attributes);
 
-      // Create simple embedding from attributes (no Vision AI needed)
+      // create simple embedding from attributes (no vision AI needed)
       const embedding = createEmbeddingFromAttributes(
         attributes,
         title,
@@ -154,7 +146,7 @@ export default function AddItemModal({
         description,
         rentPrice: parseFloat(rentPrice),
         securityDeposit: parseFloat(securityDeposit),
-        imageUrl, // Use the URL directly
+        imageUrl,
         embedding,
         attributes,
         ownerId: user.uid,
@@ -201,7 +193,6 @@ export default function AddItemModal({
       presentationStyle="pageSheet"
     >
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.cancelButton}>Cancel</Text>
@@ -215,7 +206,6 @@ export default function AddItemModal({
         </View>
 
         <ScrollView style={styles.content}>
-          {/* Title Input */}
           <View style={styles.section}>
             <Text style={styles.label}>Title *</Text>
             <TextInput
@@ -227,7 +217,6 @@ export default function AddItemModal({
             />
           </View>
 
-          {/* Description Input */}
           <View style={styles.section}>
             <Text style={styles.label}>Description *</Text>
             <TextInput
@@ -241,7 +230,6 @@ export default function AddItemModal({
             />
           </View>
 
-          {/* Replace URL input with image picker */}
           <View style={styles.section}>
             <Text style={styles.label}>Item Image *</Text>
             <TouchableOpacity
@@ -253,7 +241,6 @@ export default function AddItemModal({
               </Text>
             </TouchableOpacity>
 
-            {/* Preview image */}
             {imageUri && (
               <View style={styles.imagePreview}>
                 <Image
@@ -264,14 +251,12 @@ export default function AddItemModal({
               </View>
             )}
 
-            {/* Hidden text note for demo hardcoding */}
             <Text style={styles.helperText}>
               Try titles like "Red Dress", "Blue Dress", or "Black Hoodie" for
               demo
             </Text>
           </View>
 
-          {/* Rent Price Input */}
           <View style={styles.section}>
             <Text style={styles.label}>Rent Price (per day) *</Text>
             <TextInput
@@ -284,7 +269,6 @@ export default function AddItemModal({
             />
           </View>
 
-          {/* Security Deposit Input */}
           <View style={styles.section}>
             <Text style={styles.label}>Security Deposit *</Text>
             <TextInput
@@ -302,7 +286,6 @@ export default function AddItemModal({
   );
 }
 
-// Add these new styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -348,10 +331,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    // Force white background and dark text:
     backgroundColor: "#FFFFFF",
     color: "#000000",
-    // Additional iOS fixes:
     textAlign: "left",
     textAlignVertical: "center",
   },

@@ -1,46 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppBar } from '@/components/AppBar';
-import { ThemedText } from '@/components/ThemedText';
-import { 
-  getCartItems, 
-  getCartTotal, 
-  clearCart, 
-  CartItem 
-} from '@/services/cartService';
-import { formatPrice } from '@/utils/money';
+import { AppBar } from "@/components/AppBar";
+import { ThemedText } from "@/components/ThemedText";
+import {
+  CartItem,
+  clearCart,
+  getCartItems,
+  getCartTotal,
+} from "@/services/cartService";
+import { formatPrice } from "@/utils/money";
 
 export default function CheckoutScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [totals, setTotals] = useState({ 
-    subtotal: 0, 
-    securityDeposits: 0, 
-    total: 0 
+  const [totals, setTotals] = useState({
+    subtotal: 0,
+    securityDeposits: 0,
+    total: 0,
   });
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
 
-  // Form state
-  const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
+  // form state
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
 
   useEffect(() => {
     loadCheckoutData();
@@ -50,10 +50,10 @@ export default function CheckoutScreen() {
     try {
       const items = await getCartItems();
       const cartTotals = await getCartTotal();
-      
+
       if (items.length === 0) {
-        Alert.alert('Empty Cart', 'Your cart is empty', [
-          { text: 'OK', onPress: () => router.back() }
+        Alert.alert("Empty Cart", "Your cart is empty", [
+          { text: "OK", onPress: () => router.back() },
         ]);
         return;
       }
@@ -61,8 +61,8 @@ export default function CheckoutScreen() {
       setCartItems(items);
       setTotals(cartTotals);
     } catch (error) {
-      console.error('Error loading checkout data:', error);
-      Alert.alert('Error', 'Failed to load checkout data');
+      console.error("Error loading checkout data:", error);
+      Alert.alert("Error", "Failed to load checkout data");
     } finally {
       setLoading(false);
     }
@@ -70,25 +70,31 @@ export default function CheckoutScreen() {
 
   const validateForm = () => {
     if (!email || !fullName || !phone || !address || !city || !zipCode) {
-      Alert.alert('Missing Information', 'Please fill in all personal information fields');
+      Alert.alert(
+        "Missing Information",
+        "Please fill in all personal information fields"
+      );
       return false;
     }
 
     if (!cardNumber || !expiryDate || !cvv) {
-      Alert.alert('Missing Payment Info', 'Please fill in all payment information fields');
+      Alert.alert(
+        "Missing Payment Info",
+        "Please fill in all payment information fields"
+      );
       return false;
     }
 
-    // Basic email validation
+    // basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      Alert.alert("Invalid Email", "Please enter a valid email address");
       return false;
     }
 
-    // Basic card number validation (should be 16 digits)
-    if (cardNumber.replace(/\s/g, '').length !== 16) {
-      Alert.alert('Invalid Card', 'Please enter a valid 16-digit card number');
+    // basic card number validation (should be 16 digits)
+    if (cardNumber.replace(/\s/g, "").length !== 16) {
+      Alert.alert("Invalid Card", "Please enter a valid 16-digit card number");
       return false;
     }
 
@@ -101,15 +107,10 @@ export default function CheckoutScreen() {
     setProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // simulate payment processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // In a real app, you would:
-      // 1. Process payment with Stripe/PayPal
-      // 2. Create rental records in database
-      // 3. Send confirmation emails
-      // 4. Update item availability
-
+      // in a real app, you would process payment with stripe/paypal, create rental records, send emails, update availability
       const orderData = {
         items: cartItems,
         customer: { email, fullName, phone, address, city, zipCode },
@@ -118,27 +119,29 @@ export default function CheckoutScreen() {
         orderId: `ORD-${Date.now()}`,
       };
 
-      console.log('Order placed:', orderData);
+      console.log("Order placed:", orderData);
 
-      // Clear cart after successful order
+      // clear cart after successful order
       await clearCart();
 
       Alert.alert(
-        'Order Confirmed!',
+        "Order Confirmed!",
         `Your rental order has been placed successfully.\n\nOrder ID: ${orderData.orderId}\n\nYou'll receive a confirmation email shortly.`,
         [
-          { 
-            text: 'OK', 
+          {
+            text: "OK",
             onPress: () => {
-              router.replace('/(tabs)/home');
-            }
-          }
+              router.replace("/(tabs)/home");
+            },
+          },
         ]
       );
-
     } catch (error) {
-      console.error('Error placing order:', error);
-      Alert.alert('Order Failed', 'There was an error processing your order. Please try again.');
+      console.error("Error placing order:", error);
+      Alert.alert(
+        "Order Failed",
+        "There was an error processing your order. Please try again."
+      );
     } finally {
       setProcessing(false);
     }
@@ -146,7 +149,7 @@ export default function CheckoutScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
         <AppBar title="Checkout" showWishlist={false} showCart={false} />
         <View style={styles.loadingContainer}>
           <Text>Loading checkout...</Text>
@@ -156,16 +159,19 @@ export default function CheckoutScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppBar title="Checkout" showWishlist={false} showCart={false} />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Order Summary */}
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Order Summary ({cartItems.length} item{cartItems.length !== 1 ? 's' : ''})
+            Order Summary ({cartItems.length} item
+            {cartItems.length !== 1 ? "s" : ""})
           </ThemedText>
-          
+
           {cartItems.map((item, index) => (
             <View key={`${item.itemId}-${index}`} style={styles.orderItem}>
               <Text style={styles.orderItemTitle}>{item.title}</Text>
@@ -173,7 +179,8 @@ export default function CheckoutScreen() {
                 {item.startDate} to {item.endDate} ({item.totalDays} days)
               </Text>
               <Text style={styles.orderItemPrice}>
-                {formatPrice(item.totalPrice)} + {formatPrice(item.securityDeposit)} deposit
+                {formatPrice(item.totalPrice)} +{" "}
+                {formatPrice(item.securityDeposit)} deposit
               </Text>
             </View>
           ))}
@@ -181,25 +188,30 @@ export default function CheckoutScreen() {
           <View style={styles.orderTotals}>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Rental Total:</Text>
-              <Text style={styles.totalValue}>{formatPrice(totals.subtotal)}</Text>
+              <Text style={styles.totalValue}>
+                {formatPrice(totals.subtotal)}
+              </Text>
             </View>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Security Deposits:</Text>
-              <Text style={styles.totalValue}>{formatPrice(totals.securityDeposits)}</Text>
+              <Text style={styles.totalValue}>
+                {formatPrice(totals.securityDeposits)}
+              </Text>
             </View>
             <View style={[styles.totalRow, styles.grandTotal]}>
               <Text style={styles.grandTotalLabel}>Total:</Text>
-              <Text style={styles.grandTotalValue}>{formatPrice(totals.total)}</Text>
+              <Text style={styles.grandTotalValue}>
+                {formatPrice(totals.total)}
+              </Text>
             </View>
           </View>
         </View>
 
-        {/* Personal Information */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             Personal Information
           </ThemedText>
-          
+
           <TextInput
             style={styles.input}
             placeholder="Email Address"
@@ -208,14 +220,14 @@ export default function CheckoutScreen() {
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          
+
           <TextInput
             style={styles.input}
             placeholder="Full Name"
             value={fullName}
             onChangeText={setFullName}
           />
-          
+
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
@@ -223,14 +235,14 @@ export default function CheckoutScreen() {
             onChangeText={setPhone}
             keyboardType="phone-pad"
           />
-          
+
           <TextInput
             style={styles.input}
             placeholder="Address"
             value={address}
             onChangeText={setAddress}
           />
-          
+
           <View style={styles.row}>
             <TextInput
               style={[styles.input, styles.cityInput]}
@@ -238,7 +250,7 @@ export default function CheckoutScreen() {
               value={city}
               onChangeText={setCity}
             />
-            
+
             <TextInput
               style={[styles.input, styles.zipInput]}
               placeholder="ZIP Code"
@@ -249,39 +261,43 @@ export default function CheckoutScreen() {
           </View>
         </View>
 
-        {/* Payment Information */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             Payment Information
           </ThemedText>
-          
+
           <TextInput
             style={styles.input}
             placeholder="Card Number (1234 5678 9012 3456)"
             value={cardNumber}
             onChangeText={(text) => {
-              // Format card number with spaces
-              const formatted = text.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+              // format card number with spaces
+              const formatted = text
+                .replace(/\s/g, "")
+                .replace(/(.{4})/g, "$1 ")
+                .trim();
               setCardNumber(formatted);
             }}
             keyboardType="numeric"
             maxLength={19}
           />
-          
+
           <View style={styles.row}>
             <TextInput
               style={[styles.input, styles.expiryInput]}
               placeholder="MM/YY"
               value={expiryDate}
               onChangeText={(text) => {
-                // Format expiry date
-                const formatted = text.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
+                // format expiry date
+                const formatted = text
+                  .replace(/\D/g, "")
+                  .replace(/(\d{2})(\d)/, "$1/$2");
                 setExpiryDate(formatted);
               }}
               keyboardType="numeric"
               maxLength={5}
             />
-            
+
             <TextInput
               style={[styles.input, styles.cvvInput]}
               placeholder="CVV"
@@ -296,20 +312,25 @@ export default function CheckoutScreen() {
 
         <View style={styles.disclaimerSection}>
           <Text style={styles.disclaimerText}>
-            Security deposits will be refunded after the rental period ends and items are returned in good condition.
+            Security deposits will be refunded after the rental period ends and
+            items are returned in good condition.
           </Text>
         </View>
       </ScrollView>
 
-      {/* Place Order Button */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          style={[styles.placeOrderButton, processing && styles.processingButton]}
+          style={[
+            styles.placeOrderButton,
+            processing && styles.processingButton,
+          ]}
           onPress={handlePlaceOrder}
           disabled={processing}
         >
           <Text style={styles.placeOrderButtonText}>
-            {processing ? 'Processing...' : `Place Order - ${formatPrice(totals.total)}`}
+            {processing
+              ? "Processing..."
+              : `Place Order - ${formatPrice(totals.total)}`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -320,96 +341,96 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   section: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
-    color: '#111',
+    color: "#111",
   },
   orderItem: {
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   orderItemTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#111',
+    fontWeight: "bold",
+    color: "#111",
     marginBottom: 4,
   },
   orderItemDetails: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   orderItemPrice: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#653A79',
+    fontWeight: "600",
+    color: "#653A79",
   },
   orderTotals: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: "#ddd",
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   totalLabel: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   totalValue: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111',
+    fontWeight: "600",
+    color: "#111",
   },
   grandTotal: {
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: "#ddd",
     paddingTop: 12,
     marginTop: 8,
   },
   grandTotalLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111',
+    fontWeight: "bold",
+    color: "#111",
   },
   grandTotalValue: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#653A79',
+    fontWeight: "bold",
+    color: "#653A79",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   cityInput: {
@@ -426,32 +447,32 @@ const styles = StyleSheet.create({
   },
   disclaimerSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   disclaimerText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   bottomContainer: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
-    backgroundColor: '#fff',
+    borderTopColor: "#eee",
+    backgroundColor: "#fff",
   },
   placeOrderButton: {
-    backgroundColor: '#653A79',
+    backgroundColor: "#653A79",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   processingButton: {
-    backgroundColor: '#999',
+    backgroundColor: "#999",
   },
   placeOrderButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

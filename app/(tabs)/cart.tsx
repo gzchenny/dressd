@@ -31,6 +31,7 @@ export default function CartScreen() {
     total: 0 
   });
 
+  // load cart items and calculate totals
   const loadCartItems = async () => {
     console.log('Loading cart items...');
     try {
@@ -51,6 +52,7 @@ export default function CartScreen() {
     loadCartItems();
   }, []);
 
+  // refresh cart when user navigates back
   useFocusEffect(
     useCallback(() => {
       console.log('Cart screen focused, refreshing items...');
@@ -58,6 +60,7 @@ export default function CartScreen() {
     }, [])
   );
 
+  // show confirmation before removing item
   const handleRemoveItem = async (itemId: string, startDate: string) => {
     Alert.alert(
       'Remove Item',
@@ -111,6 +114,7 @@ export default function CartScreen() {
             resizeMode="cover"
           />
         ) : (
+          // fallback to first letter if no image
           <View style={[styles.image, styles.placeholderImage]}>
             <Text style={styles.placeholderText}>
               {item.title.charAt(0)}
@@ -192,7 +196,6 @@ export default function CartScreen() {
             showsVerticalScrollIndicator={false}
           />
 
-          {/* Cart Summary */}
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Rental Total:</Text>

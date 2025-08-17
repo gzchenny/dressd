@@ -30,16 +30,17 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* hide wishlist and cart from tab bar - accessed via appbar buttons */}
       <Tabs.Screen
         name="wishlist"
         options={{
-          href: null, // Hidden from tab bar
+          href: null,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
-          href: null, // Hidden from tab bar like wishlist
+          href: null,
         }}
       />
       <Tabs.Screen
