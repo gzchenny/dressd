@@ -43,35 +43,53 @@
 ## Project Structure
 app/: Screens and file-based routing
 Home, Wishlist, Cart, Items, Styles, Product Details, Auth
+
 components/: UI components (AppBar, ProductCard, AddItemModal, etc.)
+
 services/: Business logic (cart, wishlist, user, item, embedding)
+
 types/: TypeScript types
+
 constants/: App-wide constants
+
 config/: Firebase config
+
 assets/: Images and fonts
 
 ## Key Screens
 app/(tabs)/home.tsx: Trending & personalized feed
+
 app/(tabs)/wishlist.tsx: Wishlist management
+
 app/(tabs)/cart.tsx: Cart and checkout flow
+
 app/(tabs)/items.tsx: List/manage your items
+
 app/(tabs)/styles.tsx: Style photo preferences
+
 app/product/[id].tsx: Product details & rental calendar
+
 app/signup.tsx, app/login.tsx: Authentication
 
 ## Authentication
 Firebase Auth (config/firebase.js)
+
 Sign up and log in screens
+
 User profile creation (services/userService.ts)
 
 ## Personalisation
 Upload style photos (app/(tabs)/styles.tsx)
+
 Embedding-based recommendations (services/embeddingService.ts)
 
 ## Development Notes
 File-based routing via Expo Router
+
 Custom hooks and UI components
+
 All business logic in /services
+
 TypeScript throughout
 
 ## Resetting the Project
