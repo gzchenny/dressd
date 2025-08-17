@@ -19,7 +19,6 @@ import { getItemById, ItemData } from '@/services/itemService';
 import { addToWishlist, removeFromWishlist, isItemLiked } from '@/services/wishlistService';
 import { addToCart, CartItem } from '@/services/cartService';
 
-
 const { width } = Dimensions.get('window');
 
 interface MarkedDates {
@@ -218,7 +217,6 @@ export default function ProductDetailsScreen() {
     }
   
     const days = Math.ceil((new Date(selectedEndDate).getTime() - new Date(selectedStartDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const totalPrice = days * item.rentPrice;
   
     try {
       const cartItem: CartItem = {

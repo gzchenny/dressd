@@ -154,8 +154,11 @@ export default function ItemsScreen() {
           onPress: handleAddItem,
         }}
       />
-
-      <ThemedView style={styles.content}>
+      <ThemedView
+        style={styles.content}
+        lightColor="#ffffff"
+        darkColor="#ffffff"
+      >
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>

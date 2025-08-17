@@ -117,17 +117,32 @@ export default function StylesScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppBar title="Styles" />
-      <ThemedView style={styles.content}>
+      <ThemedView
+        style={styles.content}
+        lightColor="#ffffff"
+        darkColor="#ffffff"
+      >
         <ScrollView>
-          <ThemedText type="title">Style Preferences</ThemedText>
-          <ThemedText>
+          <ThemedText type="title" lightColor="#000000" darkColor="#000000">
+            Style Preferences
+          </ThemedText>
+          <ThemedText lightColor="#000000" darkColor="#000000">
             Add photos of styles you like to get personalized recommendations.
           </ThemedText>
 
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
+          <ThemedText
+            type="subtitle"
+            style={styles.sectionTitle}
+            lightColor="#000000"
+            darkColor="#000000"
+          >
             Your Style Photos
           </ThemedText>
-          <ThemedText style={styles.sectionDescription}>
+          <ThemedText
+            style={styles.sectionDescription}
+            lightColor="#000000"
+            darkColor="#000000"
+          >
             Add photos of styles you like to personalize your recommendations.
             {preferences?.photoCount
               ? ` (${preferences.photoCount} photos)`
@@ -156,8 +171,18 @@ export default function StylesScreen() {
               onPress={addPhoto}
               disabled={loading}
             >
-              <ThemedText style={styles.addPhotoText}>+</ThemedText>
-              <ThemedText style={styles.addPhotoLabel}>
+              <ThemedText
+                style={styles.addPhotoText}
+                lightColor="#000000"
+                darkColor="#000000"
+              >
+                +
+              </ThemedText>
+              <ThemedText
+                style={styles.addPhotoLabel}
+                lightColor="#000000"
+                darkColor="#000000"
+              >
                 {loading ? "Processing..." : "Add Photo"}
               </ThemedText>
             </TouchableOpacity>
