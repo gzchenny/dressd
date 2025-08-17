@@ -209,7 +209,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-        <AppBar title="dressd" />
+        <AppBar title="dress." />
 
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#111" />
@@ -221,7 +221,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <AppBar title="dressd" />
+      <AppBar title="dress." />
 
       {/* Search */}
       <View style={styles.searchContainer}>
