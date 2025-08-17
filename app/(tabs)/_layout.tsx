@@ -7,22 +7,23 @@ import React from "react";
 import { Platform } from "react-native";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  // Force light mode colors regardless of system theme
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
-        tabBarInactiveTintColor: Colors.light.icon,
+        tabBarActiveTintColor: '#653A79',      // Your brand color
+        tabBarInactiveTintColor: '#666666',    // Gray for inactive
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',          // Force white background
+          borderTopColor: '#E6DFEA',          // Light border
+          borderTopWidth: 1,
+          position: Platform.select({
+            ios: "absolute",
+            default: undefined,
+          }),
+        },
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-          },
-          default: {},
-        }),
       }}
     >
       <Tabs.Screen
@@ -41,6 +42,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="cart"
+        options={{
+          href: null, // Hide cart from tab bar like wishlist
+        }}
+      />
+      <Tabs.Screen
         name="items"
         options={{
           title: "My Items",
@@ -52,9 +59,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Styles",
+          title: "Settings",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="photo.fill" color={color} />
+            <IconSymbol size={28} name="person.fill" color={color} />
           ),
         }}
       />

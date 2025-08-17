@@ -1,6 +1,9 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { getCartItemCount } from '@/services/cartService';
 import { ThemedText } from './ThemedText';
 import { IconSymbol } from './ui/IconSymbol';
 
@@ -12,24 +15,45 @@ interface RightButtonProps {
 
 interface AppBarProps {
   title: string;
-  showWishlist?: boolean; // Default to true
-  showCart?: boolean; // Default to true
+  showWishlist?: boolean;
+  showCart?: boolean;
   rightButton?: RightButtonProps;
 }
 
 export function AppBar({ 
   title, 
-  showWishlist = true, // Changed default to true
-  showCart = true, // Changed default to true
+  showWishlist = true,
+  showCart = true,
   rightButton 
 }: AppBarProps) {
+  const [cartCount, setCartCount] = useState(0);
+
+  const loadCartCount = async () => {
+    try {
+      const count = await getCartItemCount();
+      setCartCount(count);
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+      setCartCount(0);
+    }
+  };
+
+  useEffect(() => {
+    loadCartCount();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCartCount();
+    }, [])
+  );
+
   const handleWishlist = () => {
     router.push("/(tabs)/wishlist");
   };
 
   const handleCart = () => {
-    console.log("Navigate to cart");
-    // TODO: Navigate to cart
+    router.push("/(tabs)/cart");
   };
 
   return (
@@ -54,6 +78,11 @@ export function AppBar({
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <IconSymbol name="bag.fill" size={24} color="#111" />
+            {cartCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cartCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         )}
         
@@ -104,6 +133,7 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   textButton: {
     backgroundColor: '#653A79',
@@ -122,5 +152,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  badge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#ff3b30',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    lineHeight: 16,
   },
 });

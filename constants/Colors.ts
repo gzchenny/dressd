@@ -9,16 +9,16 @@ export const Colors = {
   light: {
     text: '#2B1F31',
     background: '#FFFFFF',
-    tint: '#792f9bff',
-    icon: '#6f4489ff',
+    tint: '#653A79',        // This controls active tab color
+    icon: '#666666',        // This controls inactive tab color
     tabIconDefault: '#B8A4C4',
     tabIconSelected: '#653A79',
   },
   dark: {
-    text: '#000000ff',
-    background: '#FFFFFF',       
-    tint: '#792f9bff',
-    icon: '#6f4489ff',
+    text: '#FFFFFF',        // Fix: was black, should be white for dark mode
+    background: '#000000',  // Fix: was white, should be black for dark mode
+    tint: '#653A79',
+    icon: '#999999',
     tabIconDefault: '#B8A4C4',
     tabIconSelected: '#653A79',
   },

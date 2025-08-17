@@ -1,6 +1,6 @@
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { auth } from "@/config/firebase";
 import { createUserProfile } from "@/services/userService";
 import { Link, router } from "expo-router";
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#FFFFFF'
   },
   header: {
     paddingBottom: 20,
