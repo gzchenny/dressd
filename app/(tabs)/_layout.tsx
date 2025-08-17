@@ -60,6 +60,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="blank"
+        options={{
+          title: "Blank",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="square.fill" color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
