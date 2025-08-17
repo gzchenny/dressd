@@ -1,10 +1,10 @@
-# 👗 dressd
+# dress.
 
-**dressd** is an app built for FoundersHack made with [Expo](https://expo.dev) and React Native. It’s an online clothing rental app that lets users rent, list, and discover designer styles, with personalised recommendations inspired by user's photos and personal style moodboards.
+**dress.** is an app built for FoundersHack made with [Expo](https://expo.dev) and React Native. It’s an online clothing rental app that lets users rent, list, and discover designer styles, with personalised recommendations inspired by user's photos and personal style moodboards.
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Browse & Search:** Explore trending and personalised items on the home screen.
 
