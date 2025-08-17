@@ -10,17 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import AddItemModal from "@/components/AddItemModal";
+import { AppBar } from "@/components/AppBar";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { auth } from "@/config/firebase";
-import { getUserItems, updateItem } from "@/services/itemService"; // Remove ItemData from here
+import { getUserItems, updateItem, ItemData } from "@/services/itemService"; // Import ItemData from itemService
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
-import { ItemData } from "@/types/itemAttributes"; // Import ItemData from types instead
-import { SafeAreaView } from "react-native-safe-area-context";
-import { AppBar } from "@/components/AppBar";
 
 const { width } = Dimensions.get("window");
 const itemWidth = (width - 60) / 2;
@@ -49,7 +47,7 @@ export default function ItemsScreen() {
   }, []);
 
   const handleItemAdded = () => {
-    loadItems(); // Refresh the list
+    loadItems();
   };
 
   const handleAddItem = () => {
@@ -65,17 +63,14 @@ export default function ItemsScreen() {
     try {
       const newStatus = !item.isActive;
 
-      // Update item status in Firestore
       await updateItem(item.id, { isActive: newStatus });
 
-      // Update user's active/inactive items arrays
       if (newStatus) {
         await moveItemToActive(user.uid, item.id);
       } else {
         await moveItemToInactive(user.uid, item.id);
       }
 
-      // Refresh the list
       loadItems();
 
       Alert.alert(
@@ -124,14 +119,10 @@ export default function ItemsScreen() {
           {item.description}
         </Text>
 
-        {/* Remove or modify the typeTag section since ItemData doesn't have a type property */}
-        <View style={styles.typeTag}>
-          <Text style={styles.typeTagText}>For Rent</Text>
-        </View>
-
         <View style={styles.priceContainer}>
-          <Text style={styles.priceText}>Rent: ${item.rentPrice}</Text>
-          <Text style={styles.priceText}>Deposit: ${item.securityDeposit}</Text>
+          {item.rentPrice && (
+            <Text style={styles.priceText}>Rent: ${item.rentPrice}</Text>
+          )}
         </View>
 
         <View style={styles.itemFooter}>
@@ -153,20 +144,8 @@ export default function ItemsScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <ThemedText type="title">My Items</ThemedText>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setShowAddModal(true)}
-          >
-            <IconSymbol name="house.fill" size={20} color="#fff" />
-            <Text style={styles.addButtonText}>Add Item</Text>
-          </TouchableOpacity>
-        </View>
-
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      {/* AppBar with heart and cart icons by default, plus Add Item button */}
       <AppBar 
         title="My Items" 
         rightButton={{ 
@@ -174,7 +153,7 @@ export default function ItemsScreen() {
           text: "Add Item", 
           onPress: handleAddItem 
         }} 
-      />
+      /> 
       
       <ThemedView style={styles.content}>
         <View style={styles.statsContainer}>
@@ -322,19 +301,6 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 8,
     lineHeight: 16,
-  },
-  typeTag: {
-    backgroundColor: "#653A79",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    alignSelf: "flex-start",
-    marginBottom: 8,
-  },
-  typeTagText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
   },
   priceContainer: {
     marginBottom: 8,

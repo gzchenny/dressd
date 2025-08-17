@@ -1,9 +1,9 @@
+import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Colors } from '@/constants/Colors';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -49,6 +49,13 @@ export default function RootLayout() {
           <Stack.Screen name="landing" options={{ headerShown: false }} />
           <Stack.Screen name="signup" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ title: 'Sign In', headerBackTitle: 'Back' }} />
+          <Stack.Screen 
+            name="product/[id]" 
+            options={{ 
+              headerShown: false,
+              presentation: 'modal' // Optional: makes it slide up from bottom
+            }} 
+          />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
