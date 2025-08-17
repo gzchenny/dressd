@@ -17,6 +17,7 @@ import { AppBar } from '@/components/AppBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { getItemById, ItemData } from '@/services/itemService';
 import { addToWishlist, removeFromWishlist, isItemLiked } from '@/services/wishlistService';
+import { addToCart, CartItem } from '@/services/cartService';
 
 const { width } = Dimensions.get('window');
 
@@ -207,39 +208,48 @@ export default function ProductDetailsScreen() {
     }
   };
 
-  const handleRentNow = () => {
+  const handleRentNow = async () => {
     if (!item) return;
     
     if (!selectedStartDate || !selectedEndDate) {
       Alert.alert('Select Dates', 'Please select your rental dates first');
       return;
     }
-
+  
     const days = Math.ceil((new Date(selectedEndDate).getTime() - new Date(selectedStartDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    
-    Alert.alert(
-      'Confirm Rental',
-      `Rent "${item.title}" from ${selectedStartDate} to ${selectedEndDate} (${days} days)\n\nTotal: $${totalPrice}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Confirm Rental', 
-          onPress: () => {
-            // TODO: Navigate to payment/confirmation flow
-            console.log('Rental confirmed:', {
-              itemId: item.id,
-              startDate: selectedStartDate,
-              endDate: selectedEndDate,
-              totalPrice,
-              days
-            });
-            Alert.alert('Success', 'Rental request submitted!');
-          }
-        }
-      ]
-    );
+  
+    try {
+      const cartItem: CartItem = {
+        itemId: item.id || '',
+        title: item.title,
+        imageUrl: item.imageUrl,
+        ownerUsername: item.ownerUsername || 'Unknown',
+        rentPrice: item.rentPrice,
+        securityDeposit: item.securityDeposit || 0,
+        startDate: selectedStartDate,
+        endDate: selectedEndDate,
+        totalDays: days,
+        totalPrice: totalPrice,
+        addedAt: new Date().toISOString(),
+      };
+  
+      await addToCart(cartItem);
+  
+      Alert.alert(
+        'Added to Cart!',
+        `"${item.title}" has been added to your cart for ${selectedStartDate} to ${selectedEndDate}`,
+        [
+          { text: 'Continue Shopping', onPress: () => router.back() },
+          { text: 'View Cart', onPress: () => router.push('/(tabs)/cart' as any) }
+        ]
+      );
+  
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      Alert.alert('Error', 'Failed to add item to cart');
+    }
   };
-
+  
   const clearSelection = () => {
     setSelectedStartDate('');
     setSelectedEndDate('');

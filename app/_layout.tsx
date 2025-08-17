@@ -62,7 +62,7 @@ export default function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="landing" options={{ headerShown: false }} />
@@ -133,7 +133,7 @@ export function TabLayout() {
         options={{
           title: "Styles",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="photo.fill" color={color} />
+            <IconSymbol size={28} name="bag.fill" color={color} />
           ),
         }}
       />
