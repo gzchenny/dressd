@@ -17,7 +17,7 @@ import { AppBar } from "@/components/AppBar";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { auth } from "@/config/firebase";
-import { getUserItems, updateItem, ItemData } from "@/services/itemService"; // Import ItemData from itemService
+import { getUserItems, ItemData, updateItem } from "@/services/itemService"; // Import ItemData from itemService
 import { moveItemToActive, moveItemToInactive } from "@/services/userService";
 
 const { width } = Dimensions.get("window");
@@ -144,17 +144,17 @@ export default function ItemsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       {/* AppBar with heart and cart icons by default, plus Add Item button */}
-      <AppBar 
-        title="My Items" 
-        rightButton={{ 
-          icon: "house.fill", 
-          text: "Add Item", 
-          onPress: handleAddItem 
-        }} 
-      /> 
-      
+      <AppBar
+        title="My Items"
+        rightButton={{
+          icon: "house.fill",
+          text: "Add Item",
+          onPress: handleAddItem,
+        }}
+      />
+
       <ThemedView style={styles.content}>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
@@ -207,7 +207,7 @@ export default function ItemsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   content: {
     flex: 1,

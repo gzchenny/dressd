@@ -1,12 +1,10 @@
+import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
-import { Colors } from '@/constants/Colors';
-import { HapticTab } from "@/components/HapticTab";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -15,7 +13,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.light.tint,
-        tabBarInactiveTintColor: Colors.light.icon,        
+        tabBarInactiveTintColor: Colors.light.icon,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
@@ -54,18 +52,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: "Styles",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="blank"
-        options={{
-          title: "Blank",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="square.fill" color={color} />
+            <IconSymbol size={28} name="photo.fill" color={color} />
           ),
         }}
       />

@@ -1,63 +1,105 @@
-import { ItemAttributes } from '@/types/itemAttributes';
-
-export const generateItemAttributes = (title: string, description: string): ItemAttributes => {
+export const generateItemAttributes = (title: string, description: string) => {
   const text = `${title} ${description}`.toLowerCase();
   
-  return {
-    colors: {
-      black: calculateScore(text, ['black', 'noir', 'dark', 'charcoal']),
-      white: calculateScore(text, ['white', 'cream', 'ivory', 'off-white']),
-      red: calculateScore(text, ['red', 'crimson', 'burgundy', 'wine']),
-      blue: calculateScore(text, ['blue', 'navy', 'denim', 'royal']),
-      green: calculateScore(text, ['green', 'olive', 'forest', 'emerald']),
-      yellow: calculateScore(text, ['yellow', 'gold', 'mustard', 'sunshine']),
-      pink: calculateScore(text, ['pink', 'rose', 'blush', 'coral']),
-      brown: calculateScore(text, ['brown', 'tan', 'beige', 'camel']),
-      neutral: calculateScore(text, ['neutral', 'beige', 'taupe', 'khaki']),
-    },
-    vibes: {
-      casual: calculateScore(text, ['casual', 'relaxed', 'comfortable', 'everyday', 'laid-back']),
-      formal: calculateScore(text, ['formal', 'elegant', 'sophisticated', 'dressy', 'professional']),
-      bohemian: calculateScore(text, ['boho', 'bohemian', 'free-spirited', 'flowy', 'hippie']),
-      minimalist: calculateScore(text, ['minimal', 'clean', 'simple', 'sleek', 'modern']),
-      vintage: calculateScore(text, ['vintage', 'retro', 'classic', 'timeless', 'throwback']),
-      streetwear: calculateScore(text, ['street', 'urban', 'cool', 'trendy', 'edgy']),
-      romantic: calculateScore(text, ['romantic', 'feminine', 'soft', 'delicate', 'pretty']),
-      edgy: calculateScore(text, ['edgy', 'bold', 'statement', 'dramatic', 'fierce']),
-    },
-    occasions: {
-      work: calculateScore(text, ['work', 'office', 'professional', 'business', 'meeting']),
-      party: calculateScore(text, ['party', 'night out', 'celebration', 'clubbing', 'dancing']),
-      date: calculateScore(text, ['date', 'romantic', 'dinner', 'special', 'intimate']),
-      casual: calculateScore(text, ['casual', 'everyday', 'weekend', 'errands', 'hanging out']),
-      formal: calculateScore(text, ['formal', 'gala', 'event', 'ceremony', 'black tie']),
-      vacation: calculateScore(text, ['vacation', 'travel', 'beach', 'resort', 'holiday']),
-    },
-    seasonality: {
-      spring: calculateScore(text, ['spring', 'light', 'fresh', 'blooming', 'pastel']),
-      summer: calculateScore(text, ['summer', 'hot', 'sunny', 'bright', 'breezy']),
-      fall: calculateScore(text, ['fall', 'autumn', 'cozy', 'warm', 'layered']),
-      winter: calculateScore(text, ['winter', 'cold', 'warm', 'thick', 'heavy']),
-    }
+  const attributes = {
+    categories: [] as string[],
+    colors: [] as string[],
+    sizes: [] as string[],
+    brands: [] as string[],
+    occasions: [] as string[],
+    styles: [] as string[]
   };
+
+  // Categories
+  if (text.includes('dress')) attributes.categories.push('dress');
+  if (text.includes('top') || text.includes('blouse') || text.includes('shirt')) attributes.categories.push('top');
+  if (text.includes('skirt')) attributes.categories.push('skirt');
+  if (text.includes('pants') || text.includes('trousers')) attributes.categories.push('pants');
+  if (text.includes('jacket') || text.includes('blazer')) attributes.categories.push('jacket');
+  if (text.includes('shoes')) attributes.categories.push('shoes');
+
+  // Colors
+  const colors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'brown', 'gray', 'navy'];
+  colors.forEach(color => {
+    if (text.includes(color)) attributes.colors.push(color);
+  });
+
+  // Sizes
+  const sizes = ['xs', 'small', 'medium', 'large', 'xl', 'xxl', 's', 'm', 'l'];
+  sizes.forEach(size => {
+    if (text.includes(size)) attributes.sizes.push(size);
+  });
+
+  // Brands
+  const brands = ['zara', 'h&m', 'nike', 'adidas', 'gucci', 'prada', 'chanel'];
+  brands.forEach(brand => {
+    if (text.includes(brand)) attributes.brands.push(brand);
+  });
+
+  // If no categories found, default to 'clothing'
+  if (attributes.categories.length === 0) {
+    attributes.categories.push('clothing');
+  }
+
+  return attributes;
 };
 
-const calculateScore = (text: string, keywords: string[]): number => {
-  if (!text || !keywords) return 0;
+export const createEmbeddingFromAttributes = (
+  attributes: any, 
+  title: string, 
+  description: string
+): number[] => {
+  const embedding = new Array(512).fill(0);
   
-  const matches = keywords.filter(keyword => text.includes(keyword)).length;
-  // Return a score between 0 and 1, with some randomness for demo variety
-  const baseScore = Math.min(matches * 0.3, 1);
-  const randomBoost = Math.random() * 0.2; // Add some variety for demo
-  return Math.min(baseScore + randomBoost, 1);
+  // Use text analysis to create meaningful embeddings
+  const text = `${title} ${description}`.toLowerCase();
+  const words = text.split(' ');
+  
+  // Map categories to embedding dimensions (0-50)
+  const categoryMap: { [key: string]: number } = {
+    'dress': 0.9,
+    'top': 0.8,
+    'shirt': 0.7,
+    'pants': 0.6,
+    'skirt': 0.5,
+    'jacket': 0.4,
+    'shoes': 0.3,
+    'clothing': 0.2
+  };
+  
+  attributes.categories.forEach((cat: string, index: number) => {
+    if (index < 50) {
+      embedding[index] = categoryMap[cat] || 0.1;
+    }
+  });
+  
+  // Map colors to embedding dimensions (50-100)
+  const colorMap: { [key: string]: number } = {
+    'black': 0.9, 'white': 0.8, 'red': 0.7, 'blue': 0.6,
+    'green': 0.5, 'yellow': 0.4, 'pink': 0.3, 'purple': 0.2
+  };
+  
+  attributes.colors.forEach((color: string, index: number) => {
+    if (index < 50) {
+      embedding[50 + index] = colorMap[color] || 0.1;
+    }
+  });
+  
+  // Use word frequency for remaining dimensions (100-200)
+  words.forEach((word, index) => {
+    if (index < 100 && word.length > 2) {
+      const charSum = word.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      embedding[100 + index] = (charSum % 100) / 100;
+    }
+  });
+  
+  // Fill remaining dimensions with normalized values
+  for (let i = 200; i < 512; i++) {
+    embedding[i] = Math.random() * 0.1;
+  }
+  
+  return embedding;
 };
 
-// Helper to flatten attributes into a vector for similarity calculations
-export const flattenAttributes = (attributes: ItemAttributes): number[] => {
-  return [
-    ...Object.values(attributes.colors),
-    ...Object.values(attributes.vibes),
-    ...Object.values(attributes.occasions),
-    ...Object.values(attributes.seasonality),
-  ];
-};
+// Add this alias for backwards compatibility if needed
+export const flattenAttributes = createEmbeddingFromAttributes;

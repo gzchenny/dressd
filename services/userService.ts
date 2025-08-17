@@ -8,14 +8,41 @@ export interface UserData {
   birthday: string;
   location: string;
   trustworthyRating: number;
-  activeItems: string[]; // Items available for rent/sale
-  inactiveItems: string[]; // Items being cleaned, rented out, etc.
-  activeRentals: string[]; // Items user is currently renting from others
-  inactiveRentals: string[]; // Past rentals
+  activeItems: string[];
+  inactiveItems: string[];
+  activeRentals: string[];
+  inactiveRentals: string[];
   soldItems: string[];
   rentedOutRentals: string[];
   createdAt: string;
   updatedAt: string;
+  stylePreferences?: {
+    photos: Array<{
+      uri: string;
+      embedding: number[];
+      addedAt: string;
+    }>;
+    combinedEmbedding?: number[]; // This is the user's style profile embedding
+    photoCount: number;
+    lastUpdated: string;
+  };
+}
+
+export interface UserProfile {
+  email: string;
+  username: string;
+  birthday: string;
+  location: string;
+  stylePreferences?: {
+    photos: Array<{
+      uri: string;
+      embedding: number[];
+      addedAt: string;
+    }>;
+    combinedEmbedding?: number[]; // Optional - only exists when photos are added
+    photoCount: number;
+    lastUpdated: string;
+  };
 }
 
 export const createUserProfile = async (userId: string, userData: Partial<UserData>) => {
@@ -29,14 +56,21 @@ export const createUserProfile = async (userId: string, userData: Partial<UserDa
     birthday: userData.birthday || '',
     location: userData.location || '',
     trustworthyRating: 5.0,
-    activeItems: [], // Changed from activeRentals
-    inactiveItems: [], // New field
+    activeItems: [], 
+    inactiveItems: [], 
     activeRentals: [],
     inactiveRentals: [],
     soldItems: [],
     rentedOutRentals: [],
     createdAt: now,
     updatedAt: now,
+    // Initialize stylePreferences structure
+    stylePreferences: {
+      photos: [],
+      photoCount: 0,
+      lastUpdated: now
+      // combinedEmbedding will be added when user adds first photo
+    },
     ...userData
   };
   
@@ -44,13 +78,31 @@ export const createUserProfile = async (userId: string, userData: Partial<UserDa
   return defaultUserData;
 };
 
-export const getUserProfile = async (userId: string): Promise<UserData | null> => {
+export const updateUserPreferences = async (
+  userId: string, 
+  preferences: any // Use any to allow optional combinedEmbedding
+): Promise<void> => {
+  const userRef = doc(db, 'users', userId);
+  
+  // Clean the preferences object to remove undefined values
+  const cleanPreferences = Object.fromEntries(
+    Object.entries(preferences).filter(([_, value]) => value !== undefined)
+  );
+  
+  await updateDoc(userRef, {
+    stylePreferences: cleanPreferences,
+    updatedAt: new Date().toISOString()
+  });
+};
+
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
   
   if (userSnap.exists()) {
-    return userSnap.data() as UserData;
+    return { id: userSnap.id, ...userSnap.data() } as UserProfile;
   }
+  
   return null;
 };
 

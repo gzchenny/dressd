@@ -13,7 +13,7 @@ export default function LandingScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={['top', 'left', 'right']}>
     <ThemedView style={styles.container}>
       <View style={styles.center}>
-        <ThemedText type="title" style={[styles.title, { color: '#653A79' }]}>Dressd</ThemedText>
+        <ThemedText type="title" style={[styles.title, { color: '#653A79' }]}>dress.</ThemedText>
         <ThemedText style={[styles.tagline, { color: '#653A79' }]}>Rent fashion. Refresh style.</ThemedText>
       </View>
 

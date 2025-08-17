@@ -1,4 +1,4 @@
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,15 +11,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppBar } from "@/components/AppBar";
 import { ProductCard } from "@/components/ProductCard";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { getAllActiveItems, ItemData } from "@/services/itemService";
-import { addToWishlist, getLikedItemIds, removeFromWishlist } from "@/services/wishlistService";
-import { getUserPreferences } from "@/services/userPreferencesService";
 import { calculateSimilarity } from "@/services/embeddingService";
+import { getAllActiveItems, ItemData } from "@/services/itemService";
+import { getUserPreferences } from "@/services/userPreferencesService";
+import {
+  addToWishlist,
+  getLikedItemIds,
+  removeFromWishlist,
+} from "@/services/wishlistService";
 import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -32,7 +36,9 @@ interface ItemWithSimilarity extends ItemData {
 
 export default function HomeScreen() {
   const [items, setItems] = useState<ItemData[]>([]);
-  const [personalizedItems, setPersonalizedItems] = useState<ItemWithSimilarity[]>([]);
+  const [personalizedItems, setPersonalizedItems] = useState<
+    ItemWithSimilarity[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,39 +56,41 @@ export default function HomeScreen() {
       const [allItems, likedItemIds, userPreferences] = await Promise.all([
         getAllActiveItems(),
         getLikedItemIds(),
-        getUserPreferences()
+        getUserPreferences(),
       ]);
-      
+
       // Transform items to include mock data for enhanced UI
-      const enhancedItems = allItems.map(item => ({
+      const enhancedItems = allItems.map((item) => ({
         ...item,
         brand: item.ownerUsername || "Designer",
         originalRetail: item.rentPrice ? item.rentPrice * 5 : undefined,
         liked: likedItemIds.includes(item.id || ""),
-        // Add mock embedding for demonstration (in real app, these would be pre-computed)
-        embedding: generateMockEmbedding()
+        // Use real embeddings from database (no more mock generation)
       }));
-      
+
       setItems(enhancedItems);
       setLikedItems(new Set(likedItemIds));
-      
-      // Generate personalized recommendations
+
+      // Generate personalized recommendations with real embeddings
       if (userPreferences?.embedding) {
         setHasPreferences(true);
-        const itemsWithSimilarity = enhancedItems.map(item => ({
-          ...item,
-          similarity: calculateSimilarity(userPreferences.embedding!, item.embedding || [])
-        }));
-        
-        // Sort by similarity and take top items
+        const itemsWithSimilarity = enhancedItems
+          .filter((item) => item.embedding && item.embedding.length > 0)
+          .map((item) => ({
+            ...item,
+            similarity: calculateSimilarity(
+              userPreferences.embedding!, // This should now be the combinedEmbedding
+              item.embedding!
+            ),
+          }));
+
         const sortedPersonalized = itemsWithSimilarity
           .sort((a, b) => (b.similarity || 0) - (a.similarity || 0))
           .slice(0, 8);
-          
+
         setPersonalizedItems(sortedPersonalized);
       } else {
         setHasPreferences(false);
-        // Fallback: show most liked items or random selection
         setPersonalizedItems(enhancedItems.slice(0, 8));
       }
     } catch (error) {
@@ -93,11 +101,6 @@ export default function HomeScreen() {
     }
   };
 
-  // Mock embedding generator (replace with actual embeddings in production)
-  const generateMockEmbedding = (): number[] => {
-    return Array.from({ length: 512 }, () => Math.random() * 2 - 1);
-  };
-
   useEffect(() => {
     loadItems();
   }, []);
@@ -105,17 +108,17 @@ export default function HomeScreen() {
   // Add focus effect to refresh data when navigating to this screen
   useFocusEffect(
     useCallback(() => {
-      console.log('Home screen focused, refreshing items...');
+      console.log("Home screen focused, refreshing items...");
       loadItems();
     }, [])
   );
 
   const handleToggleLike = async (id: string, liked: boolean) => {
     console.log(`Toggling like for item ${id}: ${liked}`);
-    
+
     try {
       const newLikedItems = new Set(likedItems);
-    
+
       if (liked) {
         newLikedItems.add(id);
         await addToWishlist(id);
@@ -125,18 +128,14 @@ export default function HomeScreen() {
         await removeFromWishlist(id);
         console.log(`Successfully removed item ${id} from wishlist`);
       }
-    
+
       // Update state immediately for instant UI feedback
       setLikedItems(newLikedItems);
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.id === id ? { ...item, liked } : item
-        )
+      setItems((prevItems) =>
+        prevItems.map((item) => (item.id === id ? { ...item, liked } : item))
       );
-      setPersonalizedItems(prevItems => 
-        prevItems.map(item => 
-          item.id === id ? { ...item, liked } : item
-        )
+      setPersonalizedItems((prevItems) =>
+        prevItems.map((item) => (item.id === id ? { ...item, liked } : item))
       );
     } catch (error) {
       console.error(`Error toggling like for item ${id}:`, error);
@@ -209,9 +208,9 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
         <AppBar title="dressd" />
-        
+
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#111" />
           <Text style={styles.loadingText}>Loading items...</Text>
@@ -221,7 +220,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <AppBar title="dressd" />
 
       {/* Search */}
@@ -242,7 +241,10 @@ export default function HomeScreen() {
         data={[]}
         renderItem={() => null}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => loadItems(true)} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => loadItems(true)}
+          />
         }
         contentContainerStyle={{ paddingBottom: 48 }} // Add this line
         ListHeaderComponent={
@@ -251,7 +253,7 @@ export default function HomeScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
-                  {hasPreferences ? 'For you' : 'Popular items'}
+                  {hasPreferences ? "For you" : "Popular items"}
                 </Text>
                 {!hasPreferences && (
                   <TouchableOpacity onPress={handleAddPreferences}>
@@ -259,13 +261,14 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-              
+
               {!hasPreferences && (
                 <Text style={styles.preferencesHint}>
-                  Add style photos in Settings to get personalized recommendations
+                  Add style photos in Settings to get personalized
+                  recommendations
                 </Text>
               )}
-              
+
               <FlatList
                 data={personalizedItems}
                 renderItem={renderPersonalizedItem}
@@ -275,7 +278,7 @@ export default function HomeScreen() {
                 snapToInterval={cardWidth + 4}
                 decelerationRate="fast"
                 contentContainerStyle={styles.horizontalList}
-              />            
+              />
             </View>
 
             {/* Trending Section */}
@@ -286,7 +289,7 @@ export default function HomeScreen() {
                   <Text style={styles.moreButton}>More</Text>
                 </TouchableOpacity>
               </View>
-              
+
               <FlatList
                 data={trendingItems}
                 renderItem={renderTrendingItem}
@@ -307,16 +310,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
@@ -324,35 +327,35 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#111',
-    backgroundColor: 'transparent',
+    color: "#111",
+    backgroundColor: "transparent",
   },
   section: {
     marginBottom: 32,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111',
+    fontWeight: "bold",
+    color: "#111",
   },
   moreButton: {
     fontSize: 16,
-    color: '#111',
-    textDecorationLine: 'underline',
+    color: "#111",
+    textDecorationLine: "underline",
   },
   preferencesHint: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     paddingHorizontal: 16,
     marginBottom: 16,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   horizontalList: {
     paddingLeft: 1,
@@ -361,17 +364,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   gridRow: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginBottom: 8,
     paddingHorizontal: 8,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
-    color: '#666',
+    color: "#666",
   },
 });

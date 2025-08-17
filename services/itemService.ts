@@ -1,30 +1,36 @@
 import { db } from '@/config/firebase';
-import { ItemData } from '@/types/itemAttributes'; // Import from types
+import { ItemData } from '@/types/itemAttributes';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { flattenAttributes, generateItemAttributes } from './attributeGenerator';
+import { createEmbeddingFromAttributes, generateItemAttributes } from './attributeGenerator'; // Updated import
 
-// Remove the export { ItemData } if it exists, since it's now imported from types
-
-export const addItem = async (itemData: Omit<ItemData, 'id' | 'createdAt' | 'updatedAt' | 'attributes' | 'embedding'>): Promise<void> => {
+export const addItem = async (itemData: Omit<ItemData, 'id'>): Promise<string> => {
   try {
     const now = new Date().toISOString();
     
-    // Generate attributes based on title and description
-    const attributes = generateItemAttributes(itemData.title, itemData.description);
+    // If embedding and attributes aren't provided, generate them
+    let attributes = itemData.attributes;
+    let embedding = itemData.embedding;
     
-    // Create embedding vector
-    const embedding = flattenAttributes(attributes);
+    if (!attributes) {
+      attributes = generateItemAttributes(itemData.title, itemData.description);
+    }
     
-    // Add item to items collection with attributes included
+    if (!embedding || embedding.length === 0) {
+      embedding = createEmbeddingFromAttributes(attributes, itemData.title, itemData.description);
+    }
+    
+    // Add item to items collection
     const itemsRef = collection(db, 'items');
-    await addDoc(itemsRef, {
+    const docRef = await addDoc(itemsRef, {
       ...itemData,
       attributes,
       embedding,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: itemData.createdAt || now,
+      updatedAt: itemData.updatedAt || now,
     });
     
+    console.log('Item created with ID:', docRef.id);
+    return docRef.id;
   } catch (error) {
     console.error('Error adding item:', error);
     throw error;
